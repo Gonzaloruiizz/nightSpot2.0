@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NightSpot 2.0</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f9f9f9;
+      color: #1a1a1a;
+    }
+    header {
+      background: #ffffff;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    #controls {
+      padding: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+    select, input[type=range] {
+      padding: 0.5rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    #map {
+      height: 60vh;
+      width: 100%;
+    }
+    .info {
+      padding: 1rem;
+    }
+    .club {
+      background: #ffffff;
+      padding: 0.75rem;
+      border-radius: 16px;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .rating {
+      color: #ffaa00;
+    }
+    .btn-route {
+      background: #007aff;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>NightSpot 2.0 - Encuentra discotecas a tu estilo</header>
+  <div id="controls">
+    <label>
+      🎵 Género:
+      <select id="genreFilter">
+        <option value="todos">Todos</option>
+        <option value="reggaeton">Reguetón</option>
+        <option value="techno">Techno</option>
+        <option value="pop">Pop</option>
+        <option value="electronic">Electrónica</option>
+      </select>
+    </label>
+    <label>
+      📏 Radio (<span id="radioLabel">3</span> km):
+      <input type="range" min="1" max="10" value="3" id="rangeFilter" />
+    </label>
+  </div>
+  <div id="map"></div>
+  <div class="info" id="clubList"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([40.4168, -3.7038], 13); // Por defecto Madrid
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const clubs = [
+      { name: "Club Eclipse", lat: 0.002, lon: 0.001, genre: "reggaeton", rating: 4.5, dir: "Calle Fuego 21" },
+      { name: "Sala Lux", lat: -0.002, lon: -0.0015, genre: "techno", rating: 4.2, dir: "Avenida Sombra 9" },
+      { name: "Discoteca Neón", lat: 0.001, lon: -0.001, genre: "pop", rating: 4.8, dir: "Paseo Estrellas 12" },
+      { name: "Vibe Club", lat: -0.0015, lon: 0.0015, genre: "electronic", rating: 4.1, dir: "Calle Beat 33" }
+    ];
+
+    let userLat = 40.4168;
+    let userLon = -3.7038;
+
+    navigator.geolocation.getCurrentPosition(pos => {
+      userLat = pos.coords.latitude;
+      userLon = pos.coords.longitude;
+      map.setView([userLat, userLon], 14);
+      L.marker([userLat, userLon]).addTo(map).bindPopup('Estás aquí').openPopup();
+      renderClubs();
+    }, () => {
+      alert("No se pudo acceder a tu ubicación.");
+      renderClubs();
+    });
+
+    document.getElementById('rangeFilter').addEventListener('input', () => {
+      document.getElementById('radioLabel').textContent = document.getElementById('rangeFilter').value;
+      renderClubs();
+    });
+
+    document.getElementById('genreFilter').addEventListener('change', renderClubs);
+
+    function renderClubs() {
+      const list = document.getElementById('clubList');
+      list.innerHTML = '';
+      map.eachLayer(layer => {
+        if (layer instanceof L.Marker && !layer._popup._content.includes('Estás aquí')) {
+          map.removeLayer(layer);
+        }
+      });
+
+      const selectedGenre = document.getElementById('genreFilter').value;
+      const maxDistance = parseFloat(document.getElementById('rangeFilter').value);
+
+      clubs.forEach(club => {
+        const clat = userLat + club.lat;
+        const clon = userLon + club.lon;
+        const dist = haversine(userLat, userLon, clat, clon);
+
+        if ((selectedGenre === 'todos' || club.genre === selectedGenre) && dist <= maxDistance) {
+          const marker = L.marker([clat, clon]).addTo(map);
+          marker.bindPopup(`<b>${club.name}</b><br>${club.dir}`);
+
+          const div = document.createElement('div');
+          div.className = 'club';
+          div.innerHTML = `
+            <strong>${club.name}</strong> <span class="rating">★ ${club.rating}</span><br>
+            ${club.dir}<br>
+            <em>${club.genre}</em><br>
+            <a class="btn-route" href="https://www.google.com/maps/dir/?api=1&destination=${clat},${clon}" target="_blank">Cómo llegar</a>
+          `;
+          list.appendChild(div);
+        }
+      });
+    }
+
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+  </script>
+</body>
+</html>
