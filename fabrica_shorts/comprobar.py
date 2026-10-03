@@ -58,9 +58,8 @@ def main() -> int:
         ok(f"ffmpeg {mayor}.{menor} en {ruta}")
         herramientas.ruta_ffprobe()
         ok("ffprobe")
-        filtros = herramientas.filtros_disponibles()
         necesarios = ["subtitles", "overlay", "gradients", "loudnorm", "sidechaincompress", "amix"]
-        faltan = [f for f in necesarios if f not in filtros]
+        faltan = [f for f in necesarios if not herramientas.tiene_filtro(f)]
         if faltan:
             mal(f"A tu ffmpeg le faltan filtros: {', '.join(faltan)}",
                 "Instala la versión completa: winget install Gyan.FFmpeg")

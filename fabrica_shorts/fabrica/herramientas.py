@@ -78,9 +78,11 @@ def version_ffmpeg() -> tuple[int, int]:
 
 
 @lru_cache(maxsize=None)
-def filtros_disponibles() -> frozenset[str]:
-    salida = ejecutar([ruta_ffmpeg(), "-hide_banner", "-filters"]).stdout
-    return frozenset(m.group(1) for m in re.finditer(r"^\s*[A-Z.|]{3}\s+(\w+)\s", salida, re.M))
+def tiene_filtro(nombre: str) -> bool:
+    """¿Este ffmpeg tiene el filtro? (se pregunta uno a uno: el formato de la lista cambia entre versiones)."""
+    salida = ejecutar([ruta_ffmpeg(), "-hide_banner", "-h", f"filter={nombre}"])
+    texto = (salida.stdout + salida.stderr).strip()
+    return texto.startswith(f"Filter {nombre}")
 
 
 def duracion(ruta: Path) -> float:

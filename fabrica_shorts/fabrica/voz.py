@@ -140,7 +140,7 @@ def _kokoro(texto: str, personaje: dict, destino: Path) -> list[tuple[str, float
 
 def _robot(texto: str, personaje: dict, destino: Path) -> list[tuple[str, float, float]]:
     palabras = [w for w in texto.split() if normalizar(w)]
-    if "flite" in herramientas.filtros_disponibles():
+    if herramientas.tiene_filtro("flite"):
         archivo_texto = destino.with_suffix(".txt")
         archivo_texto.write_text(texto, encoding="utf-8")
         f = _factor_tono(personaje)

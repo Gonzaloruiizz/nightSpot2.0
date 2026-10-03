@@ -266,6 +266,7 @@ a dembow de verdad**. Para que suene a dembow auténtico hay dos caminos (los do
 | "No encuentro ffmpeg" | `winget install Gyan.FFmpeg` y **reabre** la Terminal. Si sigue, pon la ruta en `.env` → `FFMPEG_PATH=` |
 | La voz pronuncia mal una palabra | En el guion usa `{palabra|cómo se dice}`, p. ej. `{vaper|véiper}` |
 | Vídeo con `__VOZ_DE_PRUEBA` | No había internet para la voz dominicana: lleva la voz de respaldo en español (sin acento). Conéctate y vuelve a crear ese vídeo |
+| `comprobar.bat` dice "le faltan filtros" con ffmpeg 8 o 9 | Era una falsa alarma del comprobador (ffmpeg cambió el formato de su lista). Arreglado: ahora pregunta filtro por filtro. Si de verdad falla un vídeo por "subtitles", instala la versión completa: `winget install --id Gyan.FFmpeg -e` |
 | "NVENC no disponible" en tu PC | Actualiza el driver de NVIDIA y vuelve a abrir `comprobar.bat`. Mientras tanto se usa el procesador (va más lento, pero funciona) |
 
 ---
@@ -319,3 +320,6 @@ a dembow de verdad**. Para que suene a dembow auténtico hay dos caminos (los do
   voz dominicana): nuevo **`probar_voces.bat`** para escuchar y elegir voces dominicanas/caribeñas en el PC, y
   cambios de tono más suaves (Don Fello −6 Hz, Yefri +8 Hz). La música: `origen = "carpeta"` por defecto (si pones
   un beat real en `assets/musica/` se usa solo; si no, el beat compuesto) y guía para poner dembow de verdad.
+- **Prueba en el PC de Windows** (Python 3.14, ffmpeg 9.0 Essentials, RTX 2060): ✅ librerías, ✅ NVENC,
+  ✅ voz dominicana. El comprobador daba una falsa alarma de "faltan filtros" con ffmpeg 9 → corregido
+  (`herramientas.tiene_filtro` pregunta a ffmpeg filtro por filtro).
