@@ -82,6 +82,15 @@ Doble clic en **`crear_videos.bat`**. Al terminar se abre sola la carpeta `salid
 
 ---
 
+## 📱 Manejar tu PC desde el móvil
+
+Guía paso a paso en **[`GUIA_CONTROL_DESDE_EL_MOVIL.pdf`](GUIA_CONTROL_DESDE_EL_MOVIL.pdf)**. Resumen: instalar Git y
+Claude Code (`winget install Git.Git` y `winget install Anthropic.ClaudeCode`), clonar el repositorio, traer esta
+sesión con `claude --teleport session_01STeSNCn7MHffHRWHNdY7GR` y escribir `/remote-control` para verla en la app
+de Claude del móvil. Para volver otro día: `claude --continue` dentro de la carpeta y otra vez `/remote-control`.
+
+---
+
 ## 🔄 Cómo actualizar la fábrica en tu PC (cuando haya cambios nuevos)
 
 1. Descarga otra vez el ZIP del enlace del Paso 1 (clic derecho → Propiedades → **Desbloquear**).
