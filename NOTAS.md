@@ -25,12 +25,13 @@ sobre los efectos del vaper, en clave de humor y con acento dominicano.
 | 7 | (Opcional) Subida automática a YouTube | 💤 Sin empezar |
 
 ### ⏳ Qué falta / próximos pasos
-1. **Tú, en tu PC:** instalarlo (pasos de abajo), crear los vídeos con la **voz dominicana real** y escucharlos.
-   Lo único que no se ha podido probar aquí en la nube es cómo suena la voz real (la red de la nube la bloquea).
-   Si algo suena raro: cambia `velocidad` / `tono` en `ajustes.toml` o usa `{se ve|se dice}` en el guion.
-2. (Opcional) **Fase 6:** inventar guiones nuevos automáticamente con IA (necesitaría una clave en `.env`).
-3. (Opcional) **Fase 7:** subir solo a YouTube con la API oficial.
-4. (Opcional) **Plan B de voz:** las mismas voces dominicanas por la vía oficial de Microsoft (Azure, gratis
+1. **Tú, en tu PC:** instalarlo (pasos de abajo) y hacer doble clic en **`probar_voces.bat`**: crea 9 muestras
+   de voces dominicanas y caribeñas para que elijas la de Don Fello y la de Yefri (ver "🗣️ Sobre las voces").
+2. **Música:** decidir cómo poner un dembow **real** (ver "🥁 Sobre la música"). El beat que compone la fábrica
+   es solo un apaño: no suena a dembow de verdad.
+3. (Opcional) **Fase 6:** inventar guiones nuevos automáticamente con IA (necesitaría una clave en `.env`).
+4. (Opcional) **Fase 7:** subir solo a YouTube con la API oficial.
+5. (Opcional) **Plan B de voz:** las mismas voces dominicanas por la vía oficial de Microsoft (Azure, gratis
    hasta 500.000 caracteres/mes), por si algún día la voz gratuita deja de funcionar.
 
 ---
@@ -191,7 +192,37 @@ python3 -m venv .venv
     en las pausas sube. Se cambia en `ajustes.toml` → `[musica] volumen`.
   - ¿Prefieres un sonido de moda de TikTok? Crea el vídeo **sin música** (`crear_videos.bat --sin-musica`)
     y añade el sonido desde la app de TikTok al subirlo.
-  - ¿Tienes un beat con licencia? Ponlo en `assets/musica/` y en `ajustes.toml` pon `origen = "carpeta"`.
+  - ¿Tienes un beat con licencia? Mételo en `assets/musica/` y se usa solo (ver "🥁 Sobre la música").
+
+---
+
+## 🗣️ Sobre las voces (importante)
+
+- **Las voces que oyes en los vídeos de prueba de la nube NO son las de verdad.** Aquí la red bloquea la voz
+  dominicana de Microsoft, así que se usa una voz de respaldo en español (Kokoro): se entiende, pero **no es
+  natural ni dominicana**. Por eso esos vídeos llevan `__VOZ_DE_PRUEBA` en el nombre.
+- **En tu PC, con internet**, se usa la voz neuronal **dominicana** de Microsoft (`es-DO-EmilioNeural`), que suena
+  mucho más natural.
+- Solo hay **una voz dominicana de hombre**; para que Don Fello y Yefri no suenen igual se cambia un poco el tono y
+  la velocidad (cambios pequeños: los grandes suenan a robot). Otra opción es usar una voz **caribeña** (Puerto Rico,
+  Cuba o Venezuela) para uno de los dos.
+- **Para elegir: doble clic en `probar_voces.bat`.** Crea en `salida/muestras_voces/` 9 MP3 con la misma frase:
+  Emilio (dominicano) normal / grave / joven, Víctor (Puerto Rico), Manuel (Cuba), Sebastián (Venezuela) y
+  Ramona (dominicana, mujer). Copia en `ajustes.toml` la `voz`, `velocidad` y `tono` de las que te gusten.
+
+## 🥁 Sobre la música (importante)
+
+El beat que compone la fábrica sola es **solo un apaño**: hecho con matemáticas, sin instrumentos reales, **no suena
+a dembow de verdad**. Para que suene a dembow auténtico hay dos caminos (los dos legales):
+
+1. **Recomendado – música de la propia app:** crea los vídeos **sin música** (`crear_videos.bat --sin-musica`) y, al
+   publicar, añade un dembow de verdad desde la biblioteca de sonidos de **TikTok** o de **YouTube Shorts**.
+   Esa música ya está pagada por la plataforma, y además usar sonidos de moda ayuda a que el vídeo se vea más.
+2. **Un beat tuyo con licencia:** compra/alquila un beat de dembow a un productor (busca "dembow type beat" con
+   licencia que permita monetizar) o usa uno libre de derechos, y mete el MP3 en `fabrica_shorts/assets/musica/`.
+   La fábrica lo usa sola (`origen = "carpeta"` en `ajustes.toml`) y lo baja cuando hablan.
+
+⚠️ **Nunca** uses canciones descargadas de YouTube o Spotify: te silencian el vídeo o te quitan la monetización.
 
 ---
 
@@ -275,3 +306,7 @@ python3 -m venv .venv
   secuencia de imágenes). Nueva composición: gancho → subtítulos → bocadillo → personajes grandes abajo.
   En `ajustes.toml` cada personaje tiene `dibujo = "fello"` / `"yefri"`. La caché de voces solo depende de los
   ajustes de voz (cambiar colores o dibujos no obliga a regenerar voces).
+- **Mejora 3: voces y música** – Las voces de la nube no eran naturales ni dominicanas (la nube no puede usar la
+  voz dominicana): nuevo **`probar_voces.bat`** para escuchar y elegir voces dominicanas/caribeñas en el PC, y
+  cambios de tono más suaves (Don Fello −6 Hz, Yefri +8 Hz). La música: `origen = "carpeta"` por defecto (si pones
+  un beat real en `assets/musica/` se usa solo; si no, el beat compuesto) y guía para poner dembow de verdad.

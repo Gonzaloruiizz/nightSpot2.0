@@ -28,9 +28,10 @@ pausa_entre_frases = 0.22   # segundos de silencio entre una frase y la siguient
 
 [musica]
 activar = true            # false = vídeos sin música
-# "dembow"  = la fábrica compone un beat de dembow ORIGINAL (sin copyright), distinto en cada vídeo
-# "carpeta" = usa una canción tuya de assets/musica (¡solo sin copyright!)
-origen = "dembow"
+# "carpeta" = usa un beat tuyo de assets/musica (¡con licencia!). Si la carpeta está vacía,
+#             la fábrica compone su propio beat de dembow (sin copyright).
+# "dembow"  = siempre el beat compuesto por la fábrica
+origen = "carpeta"
 volumen = 1.0             # 0.5 = más bajita · 1.5 = más fuerte
 bajar_al_hablar = true    # la música baja sola cuando alguien habla
 bpm = 122                 # velocidad del dembow (118-128 suena bien)
@@ -40,15 +41,16 @@ bpm = 122                 # velocidad del dembow (118-128 suena bien)
 # (FELLO: ... / YEFRI: ...). Aquí se decide cómo suena y se ve cada uno.
 #   voz       = voz de Microsoft (es-DO = República Dominicana)
 #   velocidad = más rápido "+10%" / más lento "-10%"
-#   tono      = más agudo "+20Hz" / más grave "-10Hz"
+#   tono      = más agudo "+8Hz" / más grave "-6Hz" (cambios grandes suenan artificiales)
+#   → Para escuchar y elegir voces: doble clic en probar_voces.bat
 #   color     = color de su nombre y de sus palabras en los subtítulos
 #   voz_respaldo / velocidad_respaldo = voz sin internet (em_santa, em_alex, ef_dora)
 
 [personajes.FELLO]
 nombre = "Don Fello"
 voz = "es-DO-EmilioNeural"
-velocidad = "-4%"
-tono = "-10Hz"
+velocidad = "-6%"
+tono = "-6Hz"
 voz_respaldo = "em_santa"
 velocidad_respaldo = 0.95
 color = "#FFC93C"
@@ -58,8 +60,8 @@ lado = "izquierda"
 [personajes.YEFRI]
 nombre = "Yefri"
 voz = "es-DO-EmilioNeural"
-velocidad = "+12%"
-tono = "+22Hz"
+velocidad = "+10%"
+tono = "+8Hz"
 voz_respaldo = "em_alex"
 velocidad_respaldo = 1.1
 color = "#3DF5C8"
