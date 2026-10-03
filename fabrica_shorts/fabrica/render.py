@@ -14,12 +14,12 @@ EXTENSIONES_VIDEO = {".mp4", ".mov", ".mkv", ".webm", ".m4v"}
 
 # Colores de los fondos animados (se elige uno distinto según el vídeo)
 PALETAS = [
-    ("0x14002e", "0x5b0f8a", "0xff2e88"),
-    ("0x001a33", "0x0a6ad9", "0x22c1c3"),
-    ("0x1b0033", "0xff6a00", "0xc2185b"),
-    ("0x0b1d26", "0x1f6f78", "0x00b09b"),
-    ("0x220a3d", "0x6a3fd1", "0xf72585"),
-    ("0x0d1b2a", "0x1b998b", "0xe4ff1a"),
+    ("0x12002b", "0x4a0f7a", "0xb3166b"),
+    ("0x00152b", "0x0b4fa8", "0x14838a"),
+    ("0x1a0030", "0x8a2c00", "0x9c124f"),
+    ("0x07161d", "0x16545c", "0x0b7d6e"),
+    ("0x1a0833", "0x4f2fa3", "0xa3155e"),
+    ("0x0a1424", "0x13685f", "0x6b7a0e"),
 ]
 
 
@@ -42,6 +42,7 @@ class Capa:
     inicio: float = 0.0
     fin: float | None = None
     fundido: float = 0.0
+    activa: str | None = None   # fórmula propia de cuándo se ve (si no, de inicio a fin)
 
 
 def _args_nvenc(calidad: int) -> list[str]:
@@ -92,9 +93,11 @@ def _fondo(duracion: float, semilla: int, ajustes: dict) -> tuple[list[str], str
                 f"fps={fps},eq=brightness=-0.12:saturation=1.15,setsar=1")
     c0, c1, c2 = azar.choice(PALETAS)
     # Se dibuja pequeño y se amplía: un degradado no pierde calidad y es mucho más rápido.
-    fuente = (f"gradients=s={ancho // 4}x{alto // 4}:r={fps}:d={duracion:.3f}:n=3:"
-              f"c0={c0}:c1={c1}:c2={c2}:speed=0.015:seed={semilla}")
-    return ["-f", "lavfi", "-i", fuente], f"scale={ancho}:{alto}:flags=bicubic,setsar=1,format=yuv420p"
+    a, b = ancho // 4, alto // 4
+    fuente = (f"gradients=s={a}x{b}:r={fps}:d={duracion:.3f}:n=3:c0={c0}:c1={c1}:c2={c2}:"
+              f"x0=0:y0=0:x1={a}:y1={b}:speed=0.01:seed={semilla}")
+    return (["-f", "lavfi", "-i", fuente],
+            f"scale={ancho}:{alto}:flags=bicubic,setsar=1,vignette=angle=PI/4.5,format=yuv420p")
 
 
 def renderizar(salida: Path, duracion: float, audio: Path, subtitulos: Path | None,
@@ -116,8 +119,9 @@ def renderizar(salida: Path, duracion: float, audio: Path, subtitulos: Path | No
             cadena += f",fade=t=in:st={capa.inicio:.3f}:d={capa.fundido:.3f}:alpha=1"
         partes.append(cadena + f"[c{i}]")
         fin = capa.fin if capa.fin is not None else duracion + 1
+        activa = capa.activa or f"between(t,{capa.inicio:.3f},{fin:.3f})"
         partes.append(f"[{actual}][c{i}]overlay=x='{capa.x}':y='{capa.y}':"
-                      f"enable='between(t,{capa.inicio:.3f},{fin:.3f})':format=auto[v{i}]")
+                      f"enable='{activa}':format=auto[v{i}]")
         actual = f"v{i}"
     if subtitulos is not None:
         # Rutas relativas: así no hay líos con "C:\" en Windows.

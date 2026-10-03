@@ -19,7 +19,7 @@ sobre los efectos del vaper, en clave de humor y con acento dominicano.
 | 1 | Render vertical 1080×1920 con NVENC (NVIDIA) o procesador | ✅ Hecho |
 | 2 | Voces dominicanas + subtítulos palabra a palabra | ✅ Hecho |
 | 3 | Guiones graciosos con datos reales (OMS/CDC/FDA) | ✅ Hecho (12 guiones) |
-| 4 | Estilo visual (avatares, emojis, gancho) + dembow con "ducking" | ⏳ Falta |
+| 4 | Estilo visual (avatares, emojis, gancho) + dembow con "ducking" | ✅ Hecho |
 | 5 | Fábrica por lotes: un clic = todos los vídeos + textos para publicar | ⏳ Falta |
 | 6 | (Opcional) Inventar guiones nuevos con IA | 💤 Sin empezar |
 | 7 | (Opcional) Subida automática a YouTube | 💤 Sin empezar |
@@ -126,6 +126,37 @@ python3 -m venv .venv
 
 ---
 
+## 🎨 Cómo es cada vídeo
+
+```
+┌────────────────────────────┐  ← barra de progreso (arriba del todo)
+│  ¿AIRE CON SABOR A MANGO? 🥭 │  ← GANCHO (se ve desde el primer segundo: sirve de miniatura)
+│                            │
+│   ┌──────────┐             │  ← bocadillo con los emojis de la frase
+│   │ 🥭  💀   │             │
+│   └────▽─────┘             │
+│    (🧔🏽☝🏽)       (🧑🏽🧢💨)    │  ← Don Fello y Yefri: el que habla se ilumina y bota
+│   DON FELLO       YEFRI    │
+│                            │
+│      ESE VAPER E'          │  ← subtítulos: la palabra que suena, en el color del personaje
+│                            │
+│   (zona de botones de      │
+│    TikTok / YouTube)       │
+└────────────────────────────┘
+```
+
+- **Fondo:** degradado de colores en movimiento con humo que sube (cambia en cada vídeo).
+  Si pones clips propios en `assets/fondos/`, se usan esos.
+- **Música:** beat de **dembow original** compuesto por la fábrica (bombo, caja con el "tresillo" del dembow,
+  hi-hats, bajo 808 y una melodía que cambia en cada vídeo). **Sin copyright.**
+  - Volumen medido: mientras hablan, la música queda **~13 dB por debajo de la voz** (se oye, pero no tapa);
+    en las pausas sube. Se cambia en `ajustes.toml` → `[musica] volumen`.
+  - ¿Prefieres un sonido de moda de TikTok? Crea el vídeo **sin música** (`crear_videos.bat --sin-musica`)
+    y añade el sonido desde la app de TikTok al subirlo.
+  - ¿Tienes un beat con licencia? Ponlo en `assets/musica/` y en `ajustes.toml` pon `origen = "carpeta"`.
+
+---
+
 ## 🔑 Claves y contraseñas (`.env`)
 
 - Las claves van **solo** en `fabrica_shorts/.env`. Ese archivo **nunca se sube a GitHub** (está en `.gitignore`).
@@ -141,6 +172,7 @@ python3 -m venv .venv
 | `fabrica_shorts/ajustes.toml` | Ajustes que puedes cambiar con el Bloc de notas (voces, colores, calidad…) |
 | `fabrica_shorts/guiones/` | Los guiones, uno por vídeo (archivos `.txt`) |
 | `fabrica_shorts/assets/fuentes/` | Tipografías gratuitas (Luckiest Guy y Anton) |
+| `fabrica_shorts/assets/emojis/` | Imágenes de emojis (Noto Emoji de Google, licencia libre) |
 | `fabrica_shorts/assets/musica/` | (Opcional) tu música sin copyright. No se sube a GitHub |
 | `fabrica_shorts/assets/fondos/` | (Opcional) tus clips de fondo. No se sube a GitHub |
 | `fabrica_shorts/salida/` | Aquí aparecen los vídeos terminados. No se sube a GitHub |
@@ -180,3 +212,10 @@ python3 -m venv .venv
 - **Fase 3** – 12 guiones con Yefri (chamaco de 19 años) y Don Fello (hombre de mediana edad que lo regaña),
   humor dominicano y datos con fuente. El 01 empieza con *"Klk mi gente. ¿Tú cree que ese vaper e' aire
   con sabor a mango? ¡Mentira! Eso trae nicotina…"*. Plantilla en `guiones/_PLANTILLA.txt`.
+- **Fase 4** – Estilo y música:
+  - `fabrica/graficos.py`: avatares (Don Fello 🧔🏽‍♂️☝🏽 / Yefri 🧑🏽🧢💨), el que habla se ilumina y bota;
+    bocadillos con los emojis de cada frase; gancho con emojis; humo; barra de progreso.
+  - `fabrica/emojis.py`: emojis Noto guardados en `assets/emojis/` (se descargan solos si falta alguno).
+  - `fabrica/musica.py`: compone el dembow original. `fabrica/audio.py`: voz a -15 LUFS, música a -20 LUFS
+    con "ducking" (baja sola al hablar), fundidos de entrada/salida y limitador.
+  - Opción `--sin-musica`. Fondos más oscuros con viñeta para que se lea mejor.

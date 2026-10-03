@@ -4,6 +4,7 @@ Uso (en Windows también vale doble clic en crear_videos.bat):
     python crear_videos.py                 → crea todos los guiones de la carpeta guiones/
     python crear_videos.py 01 03           → solo los guiones cuyo nombre contiene "01" o "03"
     python crear_videos.py --voz prueba    → sin internet (voz de prueba)
+    python crear_videos.py --sin-musica    → sin el dembow de fondo
 """
 from __future__ import annotations
 
@@ -23,6 +24,8 @@ def main() -> int:
     parser.add_argument("filtros", nargs="*", help="parte del nombre de los guiones a crear")
     parser.add_argument("--voz", choices=["auto", "edge", "prueba"],
                         default=ajustes.get("voz", {}).get("motor", "auto"))
+    parser.add_argument("--sin-musica", action="store_true",
+                        help="sin música de fondo (p. ej. para poner un sonido de TikTok al subirlo)")
     parser.add_argument("--conservar", action="store_true", help="no borra los archivos intermedios")
     args = parser.parse_args()
 
@@ -39,7 +42,7 @@ def main() -> int:
     for numero, archivo in enumerate(guiones, start=1):
         print(f"\n▶ [{numero}/{len(guiones)}] {archivo.stem}")
         try:
-            r = producir(archivo, ajustes, args.voz, args.conservar)
+            r = producir(archivo, ajustes, args.voz, args.conservar, con_musica=not args.sin_musica)
             print(f"   ✅ {r.video.name} · {r.duracion:.1f} s · voz: {r.motor_voz} · "
                   f"render: {r.codificador} · {r.segundos:.0f} s")
         except ErrorFabrica as e:

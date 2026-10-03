@@ -1,0 +1,3 @@
+Imágenes de emojis de Noto Emoji (Google), versión v2.047.
+Licencia: Apache 2.0 – https://github.com/googlefonts/noto-emoji
+Si un guion usa un emoji que no está aquí, la fábrica lo descarga sola (necesita internet).

@@ -3,13 +3,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .guion import Frase, quitar_emojis
+from .guion import Frase
 
 MAX_PALABRAS = 3        # palabras por golpe de subtítulo
 MAX_LETRAS = 15         # para que quepa en una sola línea
 FINAL_DE_FRASE = (".", "?", "!", "…", ",", ";", ":")
-POSICION_SUBTITULOS = (540, 1330)
-POSICION_GANCHO = (540, 285)
+POSICION_SUBTITULOS = (540, 1335)
 
 
 def color_ass(hex_rgb: str) -> str:
@@ -61,23 +60,15 @@ ScaledBorderAndShadow: yes
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Sub,Luckiest Guy,96,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,0,0,0,0,100,100,1,0,1,8,5,5,70,70,0,1
-Style: Gancho,Luckiest Guy,82,&H004DE1FF,&H00FFFFFF,&H00000000,&H64000000,0,0,0,0,100,100,1,0,1,9,6,5,80,80,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
 
-def crear_ass(frases: list[Frase], gancho: str, duracion: float, personajes: dict,
-              ajustes: dict, destino: Path) -> None:
+def crear_ass(frases: list[Frase], duracion: float, personajes: dict, ajustes: dict, destino: Path) -> None:
     v = ajustes["video"]
     lineas = [CABECERA.format(ancho=v["ancho"], alto=v["alto"])]
-
-    texto_gancho = _limpiar(quitar_emojis(gancho)).upper()
-    if texto_gancho:
-        x, y = POSICION_GANCHO
-        efecto = r"{\an5\pos(%d,%d)\fscx20\fscy20\t(0,220,\fscx108\fscy108)\t(220,320,\fscx100\fscy100)}" % (x, y)
-        lineas.append(f"Dialogue: 2,{tiempo_ass(0)},{tiempo_ass(duracion)},Gancho,,0,0,0,,{efecto}{texto_gancho}")
 
     x, y = POSICION_SUBTITULOS
     for n, frase in enumerate(frases):
