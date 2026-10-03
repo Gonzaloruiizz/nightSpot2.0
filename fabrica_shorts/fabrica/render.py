@@ -43,6 +43,7 @@ class Capa:
     fin: float | None = None
     fundido: float = 0.0
     activa: str | None = None   # fórmula propia de cuándo se ve (si no, de inicio a fin)
+    secuencia: bool = False     # True = "imagen" es una lista ffconcat de imágenes con duraciones
 
 
 def _args_nvenc(calidad: int) -> list[str]:
@@ -112,9 +113,14 @@ def renderizar(salida: Path, duracion: float, audio: Path, subtitulos: Path | No
     partes = [f"[0:v]{filtro_fondo}[v0]"]
     actual = "v0"
     for i, capa in enumerate(capas, start=1):
-        entradas += ["-i", str(capa.imagen)]
-        # loop = la imagen se lee una sola vez y se repite en memoria (rápido)
-        cadena = f"[{i}:v]format=rgba,loop=loop=-1:size=1:start=0,setpts=N/{fps}/TB"
+        if capa.secuencia:
+            # Animación: lista de imágenes, cada una con su duración (boca y ojos)
+            entradas += ["-f", "concat", "-safe", "0", "-i", str(capa.imagen)]
+            cadena = f"[{i}:v]format=rgba,setpts=PTS-STARTPTS"
+        else:
+            entradas += ["-i", str(capa.imagen)]
+            # loop = la imagen se lee una sola vez y se repite en memoria (rápido)
+            cadena = f"[{i}:v]format=rgba,loop=loop=-1:size=1:start=0,setpts=N/{fps}/TB"
         if capa.fundido > 0:
             cadena += f",fade=t=in:st={capa.inicio:.3f}:d={capa.fundido:.3f}:alpha=1"
         partes.append(cadena + f"[c{i}]")

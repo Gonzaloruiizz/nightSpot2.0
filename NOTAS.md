@@ -163,22 +163,25 @@ python3 -m venv .venv
 ## 🎨 Cómo es cada vídeo
 
 ```
-┌────────────────────────────┐  ← barra de progreso (arriba del todo)
-│  ¿AIRE CON SABOR A MANGO? 🥭 │  ← GANCHO (se ve desde el primer segundo: sirve de miniatura)
-│                            │
-│   ┌──────────┐             │  ← bocadillo con los emojis de la frase
-│   │ 🥭  💀   │             │
-│   └────▽─────┘             │
-│    (🧔🏽☝🏽)       (🧑🏽🧢💨)    │  ← Don Fello y Yefri: el que habla se ilumina y bota
-│   DON FELLO       YEFRI    │
-│                            │
-│      ESE VAPER E'          │  ← subtítulos: la palabra que suena, en el color del personaje
-│                            │
-│   (zona de botones de      │
-│    TikTok / YouTube)       │
-└────────────────────────────┘
+┌──────────────────────────────┐  ← barra de progreso (arriba del todo)
+│  ¿AIRE CON SABOR A MANGO? 🥭  │  ← GANCHO (se ve desde el primer segundo: sirve de miniatura)
+│                              │
+│       KLK MI GENTE.          │  ← subtítulos: la palabra que suena, en el color del que habla
+│                              │
+│   ┌────────┐                 │  ← bocadillo con los emojis de la frase, sobre el que habla
+│   │ 🥭  💀 │                 │
+│   └───▽────┘                 │
+│   (Don Fello)    (Yefri)     │  ← personajes 2D: boca sincronizada con la voz, parpadean,
+│   guayabera      sudadera    │     el que habla brilla y bota un poco
+│   DON FELLO      YEFRI       │
+└──────────────────────────────┘
 ```
 
+- **Personajes 2D** (`fabrica/personajes2d.py`), dibujados con código, sin imágenes de terceros:
+  - **Don Fello**: señor de mediana edad, calvo con canas, bigote gris, gafas, guayabera; cejas de regañar.
+  - **Yefri**: chamaco de 19 años, pelo rizo, gorra roja hacia atrás, sudadera, cadenita y el vaper en la mano.
+  - 3 bocas (cerrada / entreabierta / abierta) elegidas **según el volumen de su voz** 15 veces por segundo,
+    y parpadeo cada pocos segundos. Se miran el uno al otro.
 - **Fondo:** degradado de colores en movimiento con humo que sube (cambia en cada vídeo).
   Si pones clips propios en `assets/fondos/`, se usan esos.
 - **Música:** beat de **dembow original** compuesto por la fábrica, **sin copyright**, a 122 BPM:
@@ -207,7 +210,7 @@ python3 -m venv .venv
 | `fabrica_shorts/ajustes.toml` | Ajustes que puedes cambiar con el Bloc de notas (voces, colores, calidad…) |
 | `fabrica_shorts/guiones/` | Los guiones, uno por vídeo (archivos `.txt`) |
 | `fabrica_shorts/assets/fuentes/` | Tipografías gratuitas (Luckiest Guy y Anton) |
-| `fabrica_shorts/assets/emojis/` | Imágenes de emojis (Noto Emoji de Google, licencia libre) |
+| `fabrica_shorts/assets/emojis/` | Imágenes de emojis para bocadillos y gancho (Noto Emoji de Google, licencia libre) |
 | `fabrica_shorts/assets/musica/` | (Opcional) tu música sin copyright. No se sube a GitHub |
 | `fabrica_shorts/assets/fondos/` | (Opcional) tus clips de fondo. No se sube a GitHub |
 | `fabrica_shorts/salida/` | Aquí aparecen los vídeos terminados. No se sube a GitHub |
@@ -267,3 +270,8 @@ python3 -m venv .venv
     dominicana → español sin internet → robot. El modelo (~120 MB) se descarga solo la primera vez que se necesita.
   - El beat no sonaba a dembow → `fabrica/musica.py` rehecho: caja en tresillo bien marcada, bombo/bajo 808
     con "deslizado", hi-hats en semicorcheas con acentos, cencerro, timbales, redobles y riff de sintetizador.
+- **Mejora 2: personajes 2D** – Don Fello y Yefri pasan de emojis a **dibujos 2D** con boca sincronizada
+  con la voz y parpadeo (`fabrica/personajes2d.py` + animación en `fabrica/graficos.py`, que ffmpeg monta como
+  secuencia de imágenes). Nueva composición: gancho → subtítulos → bocadillo → personajes grandes abajo.
+  En `ajustes.toml` cada personaje tiene `dibujo = "fello"` / `"yefri"`. La caché de voces solo depende de los
+  ajustes de voz (cambiar colores o dibujos no obliga a regenerar voces).

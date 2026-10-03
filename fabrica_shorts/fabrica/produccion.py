@@ -54,9 +54,9 @@ def producir(archivo: Path, ajustes: dict, motor_voz: str = "auto", conservar: b
     archivo_ass = trabajo / "subtitulos.ass"
     subtitulos.crear_ass(guion.frases, duracion, ajustes["personajes"], ajustes, archivo_ass)
 
-    # 4) Gráficos: avatares, bocadillos, gancho, humo, barra de progreso
-    print("   🎨 Gráficos", flush=True)
-    capas = graficos.crear_capas(guion, ajustes["personajes"], duracion, trabajo, semilla)
+    # 4) Gráficos: personajes 2D animados, bocadillos, gancho, humo, barra de progreso
+    print("   🎨 Gráficos y animación", flush=True)
+    capas = graficos.crear_capas(guion, ajustes["personajes"], duracion, pista_voz, trabajo, semilla)
 
     # 5) Montaje
     print("   🎬 Montando el vídeo…", flush=True)

@@ -8,7 +8,7 @@ from .guion import Frase
 MAX_PALABRAS = 3        # palabras por golpe de subtítulo
 MAX_LETRAS = 15         # para que quepa en una sola línea
 FINAL_DE_FRASE = (".", "?", "!", "…", ",", ";", ":")
-POSICION_SUBTITULOS = (540, 1335)
+POSICION_SUBTITULOS = (540, 600)
 
 
 def color_ass(hex_rgb: str) -> str:

@@ -2,21 +2,25 @@
 from __future__ import annotations
 
 import random
+import wave
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from . import config, emojis
+from . import config, emojis, personajes2d
 from .guion import EMOJI, Frase, Guion
 from .render import Capa
 
 # ─── Posiciones en pantalla (vídeo de 1080 × 1920) ───────────
-CENTRO_X = {"izquierda": 290, "derecha": 790}
-ARRIBA_TARJETA = 700          # donde empiezan los avatares
+#   gancho (arriba) → subtítulos → bocadillo → personajes 2D (abajo)
 ARRIBA_GANCHO = 175           # debajo de los menús de TikTok / YouTube
 ANCHO_GANCHO = 960
-TAM_TARJETA = (420, 480)
-ESCALA_INACTIVO = 0.8
+ARRIBA_PERSONAJES = 920
+IZQUIERDA_PERSONAJE = {"izquierda": 0, "derecha": 520}
+CABEZA = (280, 90)            # centro de la cabeza (x) y su parte de arriba (y) dentro del dibujo
+ALTO_NOMBRE = 1440            # etiqueta con el nombre, a la altura del pecho
+FPS_BOCA = 15                 # cuántas veces por segundo se decide la boca
 
 
 def _fuente(ruta: Path, tamano: int) -> ImageFont.FreeTypeFont:
@@ -38,45 +42,77 @@ def _pegar_emoji(lienzo: Image.Image, emoji: str, centro: tuple[int, int], taman
     lienzo.alpha_composite(img, (centro[0] - img.width // 2, centro[1] - img.height // 2))
 
 
-def _sombra(lienzo: Image.Image, forma, desplazamiento=(0, 10), radio=14, opacidad=130) -> None:
-    capa = Image.new("RGBA", lienzo.size, (0, 0, 0, 0))
-    ImageDraw.Draw(capa).ellipse(forma, fill=(0, 0, 0, opacidad))
-    capa = capa.filter(ImageFilter.GaussianBlur(radio))
-    lienzo.alpha_composite(capa, desplazamiento)
+# ─── Personajes 2D animados ──────────────────────────────────
+
+def _volumen_por_paso(pista_voz: Path, duracion: float) -> np.ndarray:
+    """Volumen de la voz en cada paso de 1/FPS_BOCA segundos."""
+    with wave.open(str(pista_voz), "rb") as w:
+        muestras = np.frombuffer(w.readframes(w.getnframes()), dtype="<i2").astype(np.float32) / 32768
+        frecuencia = w.getframerate()
+    por_paso = frecuencia // FPS_BOCA
+    pasos = int(np.ceil(duracion * FPS_BOCA))
+    muestras = np.pad(muestras, (0, max(0, pasos * por_paso - len(muestras))))[: pasos * por_paso]
+    return np.sqrt((muestras.reshape(pasos, por_paso) ** 2).mean(axis=1))
 
 
-# ─── Tarjeta de personaje (avatar + nombre) ──────────────────
+def animacion(clave: str, personaje: dict, frases: list[Frase], volumen: np.ndarray,
+              trabajo: Path, semilla: int) -> Path:
+    """Crea las imágenes del personaje y la lista (ffconcat) que dice cuál toca en cada momento.
 
-def tarjeta(personaje: dict, activo: bool) -> Image.Image:
-    ancho, alto = TAM_TARJETA
-    img = Image.new("RGBA", (ancho, alto), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    color = _color(personaje.get("color", "#FFFFFF"))
-    cx, cy, radio = ancho // 2, 190, 165
+    Boca: según el volumen de su voz (cerrada / entreabierta / abierta). Ojos: parpadeo cada pocos segundos.
+    """
+    dibujo = personaje.get("dibujo", clave.lower())
+    for boca in (0, 1, 2):
+        for ojos in (0, 1):
+            personajes2d.dibujar(dibujo, boca, bool(ojos)).save(trabajo / f"{clave}_b{boca}_o{ojos}.png")
 
-    circulo = (cx - radio, cy - radio, cx + radio, cy + radio)
-    _sombra(img, circulo)
-    d.ellipse(circulo, fill=(*color, 255), outline=(255, 255, 255, 255), width=10)
-    _pegar_emoji(img, personaje.get("avatar", "🙂"), (cx, cy + 10), 250)
-    if personaje.get("sombrero"):
-        _pegar_emoji(img, personaje["sombrero"], (cx - 8, cy - 118), 175, giro=12)
-    if personaje.get("mano"):
-        _pegar_emoji(img, personaje["mano"], (cx + 125, cy + 85), 120)
+    pasos = len(volumen)
+    bocas = np.zeros(pasos, dtype=int)
+    for frase in frases:
+        a, b = int(frase.inicio * FPS_BOCA), min(pasos, int(np.ceil(frase.fin * FPS_BOCA)))
+        tramo = volumen[a:b]
+        if len(tramo) == 0:
+            continue
+        nivel = tramo / max(1e-6, np.percentile(tramo, 90))
+        bocas[a:b] = np.where(nivel > 0.55, 2, np.where(nivel > 0.18, 1, 0))
 
-    fuente = _fuente(config.FUENTE_NOMBRES, 54)
+    azar = random.Random(semilla + len(clave))
+    ojos = np.zeros(pasos, dtype=int)
+    t = azar.uniform(1.0, 3.0)
+    while t * FPS_BOCA < pasos:
+        i = int(t * FPS_BOCA)
+        ojos[i:i + 2] = 1                       # ojos cerrados ~0,13 s
+        t += azar.uniform(2.5, 5.5)
+
+    lineas = ["ffconcat version 1.0"]
+    estado, inicio = (bocas[0], ojos[0]), 0
+    for i in range(1, pasos + 1):
+        nuevo = (bocas[i], ojos[i]) if i < pasos else None
+        if nuevo != estado:
+            lineas += [f"file '{clave}_b{estado[0]}_o{estado[1]}.png'", f"duration {(i - inicio) / FPS_BOCA:.4f}"]
+            estado, inicio = nuevo, i
+    lineas.append(f"file '{clave}_b0_o0.png'")
+    lista = trabajo / f"{clave}_animacion.txt"
+    lista.write_text("\n".join(lineas) + "\n", encoding="utf-8")
+    return lista
+
+
+def resplandor(color: str) -> Image.Image:
+    """Luz de color detrás del que habla."""
+    img = Image.new("RGBA", (820, 820), (0, 0, 0, 0))
+    ImageDraw.Draw(img).ellipse((170, 170, 650, 650), fill=(*_color(color), 150))
+    return img.filter(ImageFilter.GaussianBlur(60))
+
+
+def etiqueta_nombre(personaje: dict) -> Image.Image:
+    fuente = _fuente(config.FUENTE_NOMBRES, 44)
     nombre = personaje.get("nombre", "").upper()
-    ancho_texto = d.textlength(nombre, font=fuente)
-    caja = (cx - ancho_texto / 2 - 30, 378, cx + ancho_texto / 2 + 30, 458)
-    d.rounded_rectangle(caja, radius=40, fill=(15, 15, 20, 235), outline=(*color, 255), width=6)
-    d.text((cx, 418), nombre, font=fuente, fill=(255, 255, 255, 255), anchor="mm")
-
-    if not activo:
-        # Apagado: menos color y algo transparente (sin oscurecer la piel)
-        alfa = img.getchannel("A").point(lambda v: int(v * 0.8))
-        rgb = ImageEnhance.Brightness(ImageEnhance.Color(img.convert("RGB")).enhance(0.45)).enhance(0.85)
-        img = rgb.convert("RGBA")
-        img.putalpha(alfa)
-        img = img.resize((int(ancho * ESCALA_INACTIVO), int(alto * ESCALA_INACTIVO)), Image.LANCZOS)
+    color = _color(personaje.get("color", "#FFFFFF"))
+    ancho = int(fuente.getlength(nombre)) + 56
+    img = Image.new("RGBA", (ancho + 8, 76), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle((4, 4, ancho + 4, 72), radius=34, fill=(15, 15, 20, 235), outline=(*color, 255), width=5)
+    d.text((ancho / 2 + 4, 38), nombre, font=fuente, fill=(255, 255, 255, 255), anchor="mm")
     return img
 
 
@@ -182,7 +218,8 @@ def _intervalos(frases: list[Frase]) -> str:
     return "+".join(f"between(t,{f.inicio:.3f},{f.fin + 0.05:.3f})" for f in frases) or "0"
 
 
-def crear_capas(guion: Guion, personajes: dict, duracion: float, trabajo: Path, semilla: int) -> list[Capa]:
+def crear_capas(guion: Guion, personajes: dict, duracion: float, pista_voz: Path,
+                trabajo: Path, semilla: int) -> list[Capa]:
     capas: list[Capa] = []
 
     def guardar(img: Image.Image, nombre: str) -> Path:
@@ -193,30 +230,34 @@ def crear_capas(guion: Guion, personajes: dict, duracion: float, trabajo: Path, 
     # Humo de fondo subiendo despacio
     capas.append(Capa(guardar(humo(semilla), "humo.png"), x="0", y="-mod(t*45,1920)"))
 
-    # Avatares: apagados cuando no hablan, grandes y botando cuando hablan
-    for clave, p in personajes.items():
+    # Personajes 2D: luz detrás del que habla, boca sincronizada y un pequeño bote al hablar
+    volumen = _volumen_por_paso(pista_voz, duracion)
+    for n, (clave, p) in enumerate(personajes.items()):
         frases = [f for f in guion.frases if f.personaje == clave]
         if not frases:
             continue
-        cx = CENTRO_X.get(p.get("lado", "izquierda"), 290)
-        activo, inactivo = tarjeta(p, True), tarjeta(p, False)
-        centro_y = ARRIBA_TARJETA + TAM_TARJETA[1] // 2
+        izquierda = IZQUIERDA_PERSONAJE.get(p.get("lado", "izquierda"), 0)
         habla = _intervalos(frases)
-        capas.append(Capa(guardar(inactivo, f"{clave}_inactivo.png"),
-                          x=str(cx - inactivo.width // 2), y=str(centro_y - inactivo.height // 2),
-                          activa=f"eq({habla},0)"))
-        capas.append(Capa(guardar(activo, f"{clave}_activo.png"),
-                          x=str(cx - activo.width // 2),
-                          y=f"{ARRIBA_TARJETA}-16*abs(sin(t*9))", activa=habla))
+        luz = resplandor(p.get("color", "#FFFFFF"))
+        capas.append(Capa(guardar(luz, f"{clave}_luz.png"), x=str(izquierda + CABEZA[0] - luz.width // 2),
+                          y=str(ARRIBA_PERSONAJES + 260 - luz.height // 2), activa=habla))
+        lista = animacion(clave, p, frases, volumen, trabajo, semilla)
+        capas.append(Capa(lista, x=str(izquierda),
+                          y=f"{ARRIBA_PERSONAJES}+4*sin(t*2+{n * 1.7:.1f})-9*abs(sin(t*7))*({habla})",
+                          secuencia=True))
+        nombre = etiqueta_nombre(p)
+        capas.append(Capa(guardar(nombre, f"{clave}_nombre.png"),
+                          x=str(izquierda + CABEZA[0] - nombre.width // 2), y=str(ALTO_NOMBRE)))
 
-    # Bocadillos con los emojis de cada frase, encima del que habla
+    # Bocadillos con los emojis de cada frase, encima de la cabeza del que habla
     for n, frase in enumerate(guion.frases):
         if not frase.emojis:
             continue
         lado = personajes[frase.personaje].get("lado", "izquierda")
+        centro = IZQUIERDA_PERSONAJE.get(lado, 0) + CABEZA[0]
         img = bocadillo(frase.emojis, cola_izquierda=(lado == "izquierda"))
-        x = min(max(20, CENTRO_X.get(lado, 290) - img.width // 2), 1060 - img.width)
-        y0 = ARRIBA_TARJETA - img.height + 10
+        x = min(max(20, centro - img.width // 2), 1060 - img.width)
+        y0 = ARRIBA_PERSONAJES + CABEZA[1] - img.height + 4
         capas.append(Capa(guardar(img, f"bocadillo_{n:02d}.png"), x=str(x),
                           y=f"{y0}+40*max(0,1-(t-{frase.inicio:.3f})/0.18)",
                           inicio=frase.inicio, fin=frase.fin + 0.15, fundido=0.15))

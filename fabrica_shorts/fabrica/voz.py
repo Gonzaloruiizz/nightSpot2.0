@@ -197,7 +197,8 @@ def _recortar_final(ruta: Path, hasta: float) -> None:
 def sintetizar(texto: str, personaje: dict, motor: str) -> AudioFrase:
     """Audio de una frase, usando la caché si ya se hizo antes con el mismo texto y voz."""
     CARPETA_CACHE_VOZ.mkdir(parents=True, exist_ok=True)
-    clave = "|".join([motor, json.dumps(personaje, sort_keys=True, ensure_ascii=False), texto])
+    ajustes_voz = {k: personaje.get(k) for k in ("voz", "velocidad", "tono", "voz_respaldo", "velocidad_respaldo")}
+    clave = "|".join([motor, json.dumps(ajustes_voz, sort_keys=True), texto])
     nombre = hashlib.sha1(clave.encode("utf-8")).hexdigest()[:16]
     wav = CARPETA_CACHE_VOZ / f"{motor}_{nombre}.wav"
     datos = wav.with_suffix(".json")

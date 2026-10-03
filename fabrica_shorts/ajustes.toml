@@ -52,8 +52,7 @@ tono = "-10Hz"
 voz_respaldo = "em_santa"
 velocidad_respaldo = 0.95
 color = "#FFC93C"
-avatar = "🧔🏽‍♂️"
-mano = "☝🏽"
+dibujo = "fello"          # personaje 2D (fello / yefri)
 lado = "izquierda"
 
 [personajes.YEFRI]
@@ -64,7 +63,5 @@ tono = "+22Hz"
 voz_respaldo = "em_alex"
 velocidad_respaldo = 1.1
 color = "#3DF5C8"
-avatar = "🧑🏽"
-sombrero = "🧢"
-mano = "💨"
+dibujo = "yefri"
 lado = "derecha"
