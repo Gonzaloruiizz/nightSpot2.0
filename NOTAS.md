@@ -18,7 +18,7 @@ sobre los efectos del vaper, en clave de humor y con acento dominicano.
 | 0 | Estructura base, `.env`, instalador de Windows, comprobador | ✅ Hecho |
 | 1 | Render vertical 1080×1920 con NVENC (NVIDIA) o procesador | ✅ Hecho |
 | 2 | Voces dominicanas + subtítulos palabra a palabra | ✅ Hecho |
-| 3 | Guiones graciosos con datos reales (OMS/CDC/FDA) | ⏳ Falta |
+| 3 | Guiones graciosos con datos reales (OMS/CDC/FDA) | ✅ Hecho (12 guiones) |
 | 4 | Estilo visual (avatares, emojis, gancho) + dembow con "ducking" | ⏳ Falta |
 | 5 | Fábrica por lotes: un clic = todos los vídeos + textos para publicar | ⏳ Falta |
 | 6 | (Opcional) Inventar guiones nuevos con IA | 💤 Sin empezar |
@@ -87,6 +87,26 @@ YEFRI: Ay, don Fello, pero e' que huele rico. 😋
   enseña "KLK" en el subtítulo, pero la voz dice "qué lo que". Úsalo si la voz lee algo raro.
 - Los archivos que empiezan por `_` (como la plantilla) **no** se convierten en vídeo.
 - Ideal: **90-110 palabras** (30-45 segundos).
+
+### Los 12 guiones que ya hay
+
+| # | Tema | Dato real que explica | Fuente |
+|---|---|---|---|
+| 01 | ¿Aire con sabor a mango? 🥭 | No es vapor de agua: aerosol con nicotina, partículas y metales (níquel, estaño, plomo) | CDC |
+| 02 | Cerebro en construcción 🚧 | El cerebro se forma hasta los ~25; la nicotina afecta atención, aprendizaje e impulsos | CDC |
+| 03 | Un pod = una cajetilla 🚬 | Algunos pods traen tanta nicotina como 20 cigarrillos | CDC |
+| 04 | Sabor algodón de azúcar 🍭 | Comer ≠ respirar; diacetilo y "pulmón de palomitas" | CDC, Allen et al. 2016 |
+| 05 | Yefri perdió el vaper 😡 | Abstinencia: irritabilidad, ansiedad, falta de concentración | CDC |
+| 06 | Vaper en el bolsillo 🔥 | Baterías que explotan y causan quemaduras | FDA, CDC |
+| 07 | Corazón en dembow 🥁 | La nicotina sube el pulso y la presión | CDC, AHA |
+| 08 | Nube en la guagua ☁️ | El aerosol que se bota lo respiran los demás | CDC |
+| 09 | Cartuchos de la calle 🚑 | Brote EVALI 2019: 2.807 hospitalizaciones o muertes en EE. UU. | CDC |
+| 10 | La cuenta del vaper 💸 | Humor sobre el gasto (sin datos médicos) | — |
+| 11 | "Vapeo pa' no fumar" 🤔 | Los jóvenes que vapean tienen más probabilidad de acabar fumando | OMS, Soneji et al. 2017 |
+| 12 | Yefri no duerme 😵 | La nicotina es un estimulante y empeora el sueño | NIDA |
+
+> Los datos están redactados con cuidado para no exagerar: YouTube y TikTok penalizan la desinformación
+> médica. Si escribes guiones nuevos, apunta siempre la fuente en `FUENTES:`.
 
 ---
 
@@ -157,3 +177,6 @@ python3 -m venv .venv
   - `fabrica/subtitulos.py`: subtítulos grandes de 1-3 palabras; la palabra que suena se ilumina con el
     color del personaje y hace un pequeño "pop".
   - `crear_videos.py` / `crear_videos.bat`: crean los vídeos de la carpeta `guiones/`.
+- **Fase 3** – 12 guiones con Yefri (chamaco de 19 años) y Don Fello (hombre de mediana edad que lo regaña),
+  humor dominicano y datos con fuente. El 01 empieza con *"Klk mi gente. ¿Tú cree que ese vaper e' aire
+  con sabor a mango? ¡Mentira! Eso trae nicotina…"*. Plantilla en `guiones/_PLANTILLA.txt`.
