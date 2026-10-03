@@ -19,6 +19,13 @@ duracion_aviso = 59   # avisa si un vídeo dura más que esto
 codificador = "auto"
 calidad = 20          # 18 = mejor calidad (archivo grande) · 24 = más ligero
 
+[voz]
+# "auto"   = voz dominicana de Microsoft; si no hay internet, voz de prueba
+# "edge"   = solo voz dominicana (si falla, da error)
+# "prueba" = voz robótica de prueba, sin internet
+motor = "auto"
+pausa_entre_frases = 0.22   # segundos de silencio entre una frase y la siguiente
+
 # ─── PERSONAJES ────────────────────────────────────────────────
 # En los guiones cada frase empieza por el nombre en MAYÚSCULAS
 # (FELLO: ... / YEFRI: ...). Aquí se decide cómo suena y se ve cada uno.

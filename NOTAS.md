@@ -17,7 +17,7 @@ sobre los efectos del vaper, en clave de humor y con acento dominicano.
 |---|---|---|
 | 0 | Estructura base, `.env`, instalador de Windows, comprobador | ✅ Hecho |
 | 1 | Render vertical 1080×1920 con NVENC (NVIDIA) o procesador | ✅ Hecho |
-| 2 | Voces dominicanas + subtítulos palabra a palabra | ⏳ Falta |
+| 2 | Voces dominicanas + subtítulos palabra a palabra | ✅ Hecho |
 | 3 | Guiones graciosos con datos reales (OMS/CDC/FDA) | ⏳ Falta |
 | 4 | Estilo visual (avatares, emojis, gancho) + dembow con "ducking" | ⏳ Falta |
 | 5 | Fábrica por lotes: un clic = todos los vídeos + textos para publicar | ⏳ Falta |
@@ -58,6 +58,36 @@ Entra en la carpeta `fabrica_shorts` y haz **doble clic en `instalar.bat`**.
 Al final te sale una lista con ✅ / ❌. Si todo está en ✅, ¡listo!
 (Puedes volver a comprobarlo cuando quieras con doble clic en `comprobar.bat`).
 
+**Paso 6 – Crear los vídeos**
+Doble clic en **`crear_videos.bat`**. Al terminar se abre sola la carpeta `salida` con los MP4.
+- Solo algunos guiones: abre la Terminal en la carpeta `fabrica_shorts` y escribe
+  `crear_videos.bat 01 03` (crea solo los que tienen "01" o "03" en el nombre).
+- Si un vídeo sale con `__VOZ_DE_PRUEBA` en el nombre es que no había internet para la voz dominicana.
+
+---
+
+## ✍️ Cómo escribir un guion
+
+Copia `fabrica_shorts/guiones/_PLANTILLA.txt`, ponle otro nombre (p. ej. `13_mi_idea.txt`) y edítalo con el Bloc de notas:
+
+```
+TITULO: título para YouTube/TikTok
+GANCHO: frase grande que sale arriba
+DESCRIPCION: texto de la descripción
+HASHTAGS: #vaper #humor #dominicano
+FUENTES: de dónde salen los datos
+
+FELLO: {Klk|qué lo que} mi gente. ¿Tú cree que ese vaper e' aire con sabor a mango? 🥭 ¡Mentira!
+YEFRI: Ay, don Fello, pero e' que huele rico. 😋
+```
+
+- Cada frase empieza por **`FELLO:`** o **`YEFRI:`** (en mayúsculas).
+- Los **emojis no se leen** en voz alta: salen en pantalla.
+- **`{lo que se ve|lo que se dice}`** sirve para arreglar pronunciaciones. Ejemplo: `{Klk|qué lo que}`
+  enseña "KLK" en el subtítulo, pero la voz dice "qué lo que". Úsalo si la voz lee algo raro.
+- Los archivos que empiezan por `_` (como la plantilla) **no** se convierten en vídeo.
+- Ideal: **90-110 palabras** (30-45 segundos).
+
 ---
 
 ## ☁️ Cómo se usa aquí en la nube (Linux)
@@ -67,6 +97,8 @@ cd fabrica_shorts
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python comprobar.py
+.venv/bin/python crear_videos.py            # todos los guiones
+.venv/bin/python crear_videos.py 01         # solo el 01
 ```
 
 > ⚠️ Aquí en la nube la red no deja pasar la voz dominicana (usa una conexión que este entorno
@@ -102,6 +134,8 @@ python3 -m venv .venv
 |---|---|
 | "No encuentro Python" | Reinstala Python marcando **Add python.exe to PATH** |
 | "No encuentro ffmpeg" | `winget install Gyan.FFmpeg` y **reabre** la Terminal. Si sigue, pon la ruta en `.env` → `FFMPEG_PATH=` |
+| La voz pronuncia mal una palabra | En el guion usa `{palabra|cómo se dice}`, p. ej. `{vaper|véiper}` |
+| Vídeo con `__VOZ_DE_PRUEBA` | No había internet para la voz dominicana. Conéctate y vuelve a crear ese vídeo |
 | "NVENC no disponible" en tu PC | Actualiza el driver de NVIDIA y vuelve a abrir `comprobar.bat`. Mientras tanto se usa el procesador (va más lento, pero funciona) |
 
 ---
@@ -114,3 +148,12 @@ python3 -m venv .venv
   animadas, subtítulos y audio → MP4 1080×1920 a 30 fps. Detecta NVENC haciendo una **prueba real**
   (no basta con que ffmpeg diga que lo tiene); si falla, usa el procesador (libx264).
   `comprobar.py` ahora también dice si tu NVIDIA está lista. Se elige en `ajustes.toml` → `[render] codificador`.
+- **Fase 2** – Voces y subtítulos:
+  - `fabrica/guion.py` lee los guiones (personajes, emojis, truco `{se ve|se dice}`).
+  - `fabrica/voz.py`: voz dominicana de Microsoft (`edge-tts`) con el momento exacto de cada palabra;
+    Yefri suena más agudo y rápido, Don Fello más grave. Guarda cada frase en una **caché** (`.cache/`)
+    para no volver a pedirla. Si no hay internet, **voz de prueba** y el vídeo se marca `__VOZ_DE_PRUEBA`.
+    Nunca se queda colgado: máximo 45 s de espera por frase.
+  - `fabrica/subtitulos.py`: subtítulos grandes de 1-3 palabras; la palabra que suena se ilumina con el
+    color del personaje y hace un pequeño "pop".
+  - `crear_videos.py` / `crear_videos.bat`: crean los vídeos de la carpeta `guiones/`.

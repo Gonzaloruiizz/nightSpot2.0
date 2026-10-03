@@ -1,0 +1,23 @@
+# ═══════════════════════════════════════════════════════════════
+#  PLANTILLA DE GUION  (los archivos que empiezan por _ se ignoran)
+#
+#  Para crear un vídeo nuevo: copia este archivo, cámbiale el nombre
+#  (por ejemplo 13_mi_idea.txt) y escribe tu diálogo.
+#
+#  - Las líneas que empiezan por # son comentarios.
+#  - Cada frase empieza por el personaje en MAYÚSCULAS: FELLO: o YEFRI:
+#  - Los emojis NO se leen: salen en un bocadillo encima del que habla.
+#  - {lo que se ve|lo que se dice} arregla pronunciaciones:
+#      {Klk|qué lo que}  → en pantalla "KLK", la voz dice "qué lo que"
+#  - Ideal: 90-110 palabras = 30-45 segundos.
+# ═══════════════════════════════════════════════════════════════
+
+TITULO: Título del vídeo para YouTube y TikTok 😂
+GANCHO: Frase grande de arriba
+DESCRIPCION: Una o dos frases explicando el vídeo.
+HASHTAGS: #vaper #humor #dominicano #shorts
+FUENTES: De dónde sale el dato (OMS, CDC…)
+
+FELLO: {Klk|qué lo que} mi gente. ¿Tú cree que ese {vaper|véiper} e' aire con sabor a mango? 🥭 ¡Mentira! Eso trae nicotina… 💀
+YEFRI: Ay, don Fello, pero e' que huele rico. 😋
+FELLO: El veneno pa' ratas también lo hacen con sabor, mi hijo. 🐀

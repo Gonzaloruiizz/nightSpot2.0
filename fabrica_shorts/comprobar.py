@@ -94,6 +94,15 @@ def main() -> int:
     else:
         aviso("No hay .env. Ahora mismo no hace falta; instalar.bat lo crea solo.")
 
+    print("\n7) Voz dominicana (necesita internet)")
+    try:
+        from fabrica import voz
+        palabras = voz.probar_voz_dominicana()
+        ok(f"La voz es-DO-EmilioNeural funciona ({palabras} palabras sincronizadas) 🇩🇴")
+    except Exception as e:
+        aviso(f"No se pudo usar la voz dominicana ({type(e).__name__}). Se usará la voz de prueba.")
+        print("      Revisa tu conexión a internet. (En la nube de Claude es normal: está bloqueada).")
+
     print()
     if problemas:
         print(f"Hay {problemas} problema(s). Arréglalos siguiendo las flechas → y vuelve a comprobar.")
