@@ -1,5 +1,6 @@
 # Librerías de Python que usa la fábrica (instalar.bat las instala solas)
 edge-tts>=7.0,<8      # voces dominicanas gratis de Microsoft
+kokoro-onnx>=0.4      # voz en español sin internet (respaldo)
 Pillow>=10.0          # dibuja avatares, bocadillos y emojis
 numpy>=1.24           # compone el beat de dembow
 python-dotenv>=1.0    # lee el archivo .env

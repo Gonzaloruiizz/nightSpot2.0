@@ -20,9 +20,9 @@ codificador = "auto"
 calidad = 20          # 18 = mejor calidad (archivo grande) · 24 = más ligero
 
 [voz]
-# "auto"   = voz dominicana de Microsoft; si no hay internet, voz de prueba
+# "auto"   = voz dominicana de Microsoft; si no hay internet, voz en español sin internet
 # "edge"   = solo voz dominicana (si falla, da error)
-# "prueba" = voz robótica de prueba, sin internet
+# "prueba" = voz en español sin internet (Kokoro), sin acento dominicano
 motor = "auto"
 pausa_entre_frases = 0.22   # segundos de silencio entre una frase y la siguiente
 
@@ -33,7 +33,7 @@ activar = true            # false = vídeos sin música
 origen = "dembow"
 volumen = 1.0             # 0.5 = más bajita · 1.5 = más fuerte
 bajar_al_hablar = true    # la música baja sola cuando alguien habla
-bpm = 120                 # velocidad del dembow (115-125 suena bien)
+bpm = 122                 # velocidad del dembow (118-128 suena bien)
 
 # ─── PERSONAJES ────────────────────────────────────────────────
 # En los guiones cada frase empieza por el nombre en MAYÚSCULAS
@@ -42,13 +42,15 @@ bpm = 120                 # velocidad del dembow (115-125 suena bien)
 #   velocidad = más rápido "+10%" / más lento "-10%"
 #   tono      = más agudo "+20Hz" / más grave "-10Hz"
 #   color     = color de su nombre y de sus palabras en los subtítulos
-#   avatar    = emoji de su cara; sombrero / mano = emojis extra (opcionales)
+#   voz_respaldo / velocidad_respaldo = voz sin internet (em_santa, em_alex, ef_dora)
 
 [personajes.FELLO]
 nombre = "Don Fello"
 voz = "es-DO-EmilioNeural"
 velocidad = "-4%"
 tono = "-10Hz"
+voz_respaldo = "em_santa"
+velocidad_respaldo = 0.95
 color = "#FFC93C"
 avatar = "🧔🏽‍♂️"
 mano = "☝🏽"
@@ -59,6 +61,8 @@ nombre = "Yefri"
 voz = "es-DO-EmilioNeural"
 velocidad = "+12%"
 tono = "+22Hz"
+voz_respaldo = "em_alex"
+velocidad_respaldo = 1.1
 color = "#3DF5C8"
 avatar = "🧑🏽"
 sombrero = "🧢"

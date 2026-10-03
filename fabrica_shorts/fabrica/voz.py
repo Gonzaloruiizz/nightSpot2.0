@@ -1,11 +1,11 @@
 """Voces: convierte cada frase en audio y sabe en qué momento se dice cada palabra.
 
-Motores:
-  edge   → voces neuronales de Microsoft (gratis, sin clave). Las dominicanas
-           son es-DO-EmilioNeural y es-DO-RamonaNeural. Necesita internet.
-  prueba → voz robótica sin internet (o silencio) para probar la fábrica
-           donde no hay acceso a la voz real, como en la nube.
-  auto   → intenta edge y, si falla, usa prueba (y lo avisa).
+Motores (con "auto" se prueban en este orden):
+  edge   → voz DOMINICANA de Microsoft (es-DO-EmilioNeural). Gratis, necesita internet.
+  kokoro → voz neuronal en español SIN internet (Kokoro, licencia libre). No tiene acento
+           dominicano, pero se entiende bien. Respaldo y pruebas en la nube.
+           La primera vez descarga el modelo (~120 MB) a .cache/modelos.
+  robot  → último recurso: voz robótica (o silencio) solo para probar.
 """
 from __future__ import annotations
 
@@ -14,9 +14,11 @@ import hashlib
 import json
 import re
 import sys
+import urllib.request
 import wave
 from dataclasses import dataclass
 from difflib import SequenceMatcher
+from functools import lru_cache
 from pathlib import Path
 
 from . import config, herramientas
@@ -25,6 +27,10 @@ from .herramientas import ErrorFabrica
 
 FRECUENCIA = 48000
 CARPETA_CACHE_VOZ = config.CARPETA_CACHE / "voz"
+CARPETA_MODELOS = config.CARPETA_CACHE / "modelos"
+URL_KOKORO = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/{}"
+ARCHIVOS_KOKORO = ("kokoro-v1.0.int8.onnx", "voices-v1.0.bin")
+ORDEN_MOTORES = {"auto": ["edge", "kokoro", "robot"], "edge": ["edge"], "prueba": ["kokoro", "robot"]}
 
 
 @dataclass
@@ -83,7 +89,56 @@ def _factor_tono(personaje: dict) -> float:
     return min(1.35, max(0.75, 1 + hz / 130))
 
 
-def _prueba(texto: str, personaje: dict, destino: Path) -> list[tuple[str, float, float]]:
+@lru_cache(maxsize=1)
+def _modelo_kokoro():
+    from kokoro_onnx import Kokoro
+
+    CARPETA_MODELOS.mkdir(parents=True, exist_ok=True)
+    for nombre in ARCHIVOS_KOKORO:
+        ruta = CARPETA_MODELOS / nombre
+        if not ruta.exists():
+            print(f"   ⬇️  Descargando la voz sin internet ({nombre}). Solo pasa la primera vez…", flush=True)
+            parcial = ruta.with_name(ruta.name + ".parcial")
+            urllib.request.urlretrieve(URL_KOKORO.format(nombre), parcial)
+            parcial.replace(ruta)
+    return Kokoro(str(CARPETA_MODELOS / ARCHIVOS_KOKORO[0]), str(CARPETA_MODELOS / ARCHIVOS_KOKORO[1]))
+
+
+def _kokoro(texto: str, personaje: dict, destino: Path) -> list[tuple[str, float, float]]:
+    import numpy as np
+
+    modelo = _modelo_kokoro()
+    voz = personaje.get("voz_respaldo", "em_alex")
+    velocidad = float(personaje.get("velocidad_respaldo", 1.0))
+    # Se genera por trozos (entre signos de puntuación) para saber dónde empieza cada trozo
+    trozos = [t for t in re.split(r"(?<=[,.;:!?…])\s+", texto) if normalizar(t)]
+    piezas, marcas, cursor, frecuencia = [], [], 0.0, 24000
+    for trozo in trozos:
+        muestras, frecuencia = modelo.create(trozo, voice=voz, speed=velocidad, lang="es")
+        sonido = np.flatnonzero(np.abs(muestras) > 0.01)
+        if len(sonido):
+            margen = int(0.03 * frecuencia)
+            muestras = muestras[max(0, sonido[0] - margen): sonido[-1] + margen]
+        duracion = len(muestras) / frecuencia
+        palabras = [w for w in trozo.split() if normalizar(w)]
+        marcas += [(w, cursor + a, cursor + b) for w, a, b in _marcas_proporcionales(palabras, duracion)]
+        pausa = 0.28 if trozo.rstrip()[-1] in ".!?…" else 0.16 if trozo.rstrip()[-1] in ",;:" else 0.06
+        piezas += [muestras, np.zeros(int(pausa * frecuencia), dtype=muestras.dtype)]
+        cursor += duracion + pausa
+    if not piezas:
+        raise ErrorFabrica("La voz sin internet no generó audio.")
+    crudo = destino.with_name(destino.stem + "_24k.wav")
+    with wave.open(str(crudo), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(frecuencia)
+        w.writeframes((np.clip(np.concatenate(piezas), -1, 1) * 32767).astype("<i2").tobytes())
+    herramientas.ffmpeg("-i", str(crudo), "-ac", "1", "-ar", str(FRECUENCIA), str(destino))
+    crudo.unlink()
+    return marcas
+
+
+def _robot(texto: str, personaje: dict, destino: Path) -> list[tuple[str, float, float]]:
     palabras = [w for w in texto.split() if normalizar(w)]
     if "flite" in herramientas.filtros_disponibles():
         archivo_texto = destino.with_suffix(".txt")
@@ -116,7 +171,8 @@ def _marcas_proporcionales(palabras: list[str], duracion: float) -> list[tuple[s
     return marcas
 
 
-MOTORES = {"edge": _edge, "prueba": _prueba}
+MOTORES = {"edge": _edge, "kokoro": _kokoro, "robot": _robot}
+NOMBRES = {"edge": "dominicana", "kokoro": "en español sin internet", "robot": "robot"}
 
 
 # ─── Utilidades de audio ───────────────────────────────────────
@@ -141,8 +197,7 @@ def _recortar_final(ruta: Path, hasta: float) -> None:
 def sintetizar(texto: str, personaje: dict, motor: str) -> AudioFrase:
     """Audio de una frase, usando la caché si ya se hizo antes con el mismo texto y voz."""
     CARPETA_CACHE_VOZ.mkdir(parents=True, exist_ok=True)
-    clave = "|".join([motor, personaje.get("voz", ""), personaje.get("velocidad", ""),
-                      personaje.get("tono", ""), texto])
+    clave = "|".join([motor, json.dumps(personaje, sort_keys=True, ensure_ascii=False), texto])
     nombre = hashlib.sha1(clave.encode("utf-8")).hexdigest()[:16]
     wav = CARPETA_CACHE_VOZ / f"{motor}_{nombre}.wav"
     datos = wav.with_suffix(".json")
@@ -211,19 +266,22 @@ def crear_pista(frases: list[Frase], ajustes: dict, motor_pedido: str, destino: 
     """
     personajes = ajustes["personajes"]
     pausa = float(ajustes.get("voz", {}).get("pausa_entre_frases", 0.22))
-    motor = "edge" if motor_pedido in ("auto", "edge") else "prueba"
+    motores = ORDEN_MOTORES.get(motor_pedido, ORDEN_MOTORES["auto"])
     audios: list[AudioFrase] = []
-    for numero, frase in enumerate(frases, start=1):
-        print(f"   🎙️  Voz {numero}/{len(frases)} ({personajes[frase.personaje]['nombre']})", flush=True)
+    for motor in motores:
+        audios = []
         try:
-            audio = sintetizar(frase.texto_voz, personajes[frase.personaje], motor)
+            for numero, frase in enumerate(frases, start=1):
+                nombre = personajes[frase.personaje]["nombre"]
+                print(f"   🎙️  Voz {numero}/{len(frases)} ({nombre}, voz {NOMBRES[motor]})", flush=True)
+                audios.append(sintetizar(frase.texto_voz, personajes[frase.personaje], motor))
+            break
         except Exception as error:
-            if motor_pedido != "auto" or motor == "prueba":
+            if motor == motores[-1]:
                 raise ErrorFabrica(f"No se pudo crear la voz: {error}") from error
-            print(f"   ⚠️  La voz dominicana no está disponible ({type(error).__name__}). "
-                  "Uso la VOZ DE PRUEBA.")
-            return crear_pista(frases, ajustes, "prueba", destino)
-        audios.append(audio)
+            siguiente = NOMBRES[motores[motores.index(motor) + 1]]
+            print(f"   ⚠️  La voz {NOMBRES[motor]} no está disponible ({type(error).__name__}). "
+                  f"Uso la voz {siguiente}.", flush=True)
 
     with wave.open(str(destino), "wb") as salida:
         salida.setnchannels(1)

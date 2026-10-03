@@ -155,7 +155,8 @@ python3 -m venv .venv
 ```
 
 > ⚠️ Aquí en la nube la red no deja pasar la voz dominicana (usa una conexión que este entorno
-> bloquea). En la nube se usa una **voz de prueba**; la voz dominicana real sale en tu PC.
+> bloquea). En la nube se usa la **voz de respaldo en español sin internet** (Kokoro): se entiende bien,
+> pero **sin acento dominicano**. La voz dominicana real sale en tu PC.
 
 ---
 
@@ -180,8 +181,9 @@ python3 -m venv .venv
 
 - **Fondo:** degradado de colores en movimiento con humo que sube (cambia en cada vídeo).
   Si pones clips propios en `assets/fondos/`, se usan esos.
-- **Música:** beat de **dembow original** compuesto por la fábrica (bombo, caja con el "tresillo" del dembow,
-  hi-hats, bajo 808 y una melodía que cambia en cada vídeo). **Sin copyright.**
+- **Música:** beat de **dembow original** compuesto por la fábrica, **sin copyright**, a 122 BPM:
+  caja fuerte en el "pum-PÁ-pum-PÁ" del dembow (tresillo 3+3+2), bombo y bajo 808, hi-hats en semicorcheas,
+  cencerro, repiques de timbal, redobles y un riff de sintetizador que cambia en cada vídeo.
   - Volumen medido: mientras hablan, la música queda **~13 dB por debajo de la voz** (se oye, pero no tapa);
     en las pausas sube. Se cambia en `ajustes.toml` → `[musica] volumen`.
   - ¿Prefieres un sonido de moda de TikTok? Crea el vídeo **sin música** (`crear_videos.bat --sin-musica`)
@@ -220,7 +222,7 @@ python3 -m venv .venv
 | "No encuentro Python" | Reinstala Python marcando **Add python.exe to PATH** |
 | "No encuentro ffmpeg" | `winget install Gyan.FFmpeg` y **reabre** la Terminal. Si sigue, pon la ruta en `.env` → `FFMPEG_PATH=` |
 | La voz pronuncia mal una palabra | En el guion usa `{palabra|cómo se dice}`, p. ej. `{vaper|véiper}` |
-| Vídeo con `__VOZ_DE_PRUEBA` | No había internet para la voz dominicana. Conéctate y vuelve a crear ese vídeo |
+| Vídeo con `__VOZ_DE_PRUEBA` | No había internet para la voz dominicana: lleva la voz de respaldo en español (sin acento). Conéctate y vuelve a crear ese vídeo |
 | "NVENC no disponible" en tu PC | Actualiza el driver de NVIDIA y vuelve a abrir `comprobar.bat`. Mientras tanto se usa el procesador (va más lento, pero funciona) |
 
 ---
@@ -259,3 +261,9 @@ python3 -m venv .venv
     y recordatorios de publicación. Avisa si el título pasa de 100 caracteres o el vídeo de 59 s.
   - El vídeo se crea en `.trabajo/` y solo se mueve a `salida/` al terminar: si cortas la fábrica a mitad,
     no queda un vídeo a medias que luego se dé por hecho. Sin `#shorts` en el texto de TikTok.
+- **Mejora 1 (tras ver el primer vídeo)**:
+  - La voz de prueba (robot en inglés) no se entendía → ahora el respaldo es **Kokoro**, una voz neuronal
+    en español que funciona **sin internet** (Don Fello = `em_santa`, Yefri = `em_alex`). Orden con `auto`:
+    dominicana → español sin internet → robot. El modelo (~120 MB) se descarga solo la primera vez que se necesita.
+  - El beat no sonaba a dembow → `fabrica/musica.py` rehecho: caja en tresillo bien marcada, bombo/bajo 808
+    con "deslizado", hi-hats en semicorcheas con acentos, cencerro, timbales, redobles y riff de sintetizador.
