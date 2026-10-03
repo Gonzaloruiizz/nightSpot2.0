@@ -13,6 +13,7 @@ import asyncio
 import hashlib
 import json
 import re
+import sys
 import wave
 from dataclasses import dataclass
 from difflib import SequenceMatcher
@@ -60,7 +61,11 @@ def _edge(texto: str, personaje: dict, destino: Path) -> list[tuple[str, float, 
         await asyncio.wait_for(descargar(), timeout=LIMITE_EDGE)
 
     try:
-        asyncio.run(con_limite())
+        if sys.platform == "win32" and sys.version_info >= (3, 12):
+            # En Windows este tipo de bucle evita mensajes de error falsos al terminar
+            asyncio.run(con_limite(), loop_factory=asyncio.SelectorEventLoop)
+        else:
+            asyncio.run(con_limite())
     except asyncio.TimeoutError:
         raise ErrorFabrica(f"La voz de Microsoft no respondió en {LIMITE_EDGE} s (¿hay internet?).") from None
     if not audio:

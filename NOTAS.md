@@ -20,9 +20,18 @@ sobre los efectos del vaper, en clave de humor y con acento dominicano.
 | 2 | Voces dominicanas + subtítulos palabra a palabra | ✅ Hecho |
 | 3 | Guiones graciosos con datos reales (OMS/CDC/FDA) | ✅ Hecho (12 guiones) |
 | 4 | Estilo visual (avatares, emojis, gancho) + dembow con "ducking" | ✅ Hecho |
-| 5 | Fábrica por lotes: un clic = todos los vídeos + textos para publicar | ⏳ Falta |
+| 5 | Fábrica por lotes: un clic = todos los vídeos + textos para publicar | ✅ Hecho |
 | 6 | (Opcional) Inventar guiones nuevos con IA | 💤 Sin empezar |
 | 7 | (Opcional) Subida automática a YouTube | 💤 Sin empezar |
+
+### ⏳ Qué falta / próximos pasos
+1. **Tú, en tu PC:** instalarlo (pasos de abajo), crear los vídeos con la **voz dominicana real** y escucharlos.
+   Lo único que no se ha podido probar aquí en la nube es cómo suena la voz real (la red de la nube la bloquea).
+   Si algo suena raro: cambia `velocidad` / `tono` en `ajustes.toml` o usa `{se ve|se dice}` en el guion.
+2. (Opcional) **Fase 6:** inventar guiones nuevos automáticamente con IA (necesitaría una clave en `.env`).
+3. (Opcional) **Fase 7:** subir solo a YouTube con la API oficial.
+4. (Opcional) **Plan B de voz:** las mismas voces dominicanas por la vía oficial de Microsoft (Azure, gratis
+   hasta 500.000 caracteres/mes), por si algún día la voz gratuita deja de funcionar.
 
 ---
 
@@ -60,9 +69,33 @@ Al final te sale una lista con ✅ / ❌. Si todo está en ✅, ¡listo!
 
 **Paso 6 – Crear los vídeos**
 Doble clic en **`crear_videos.bat`**. Al terminar se abre sola la carpeta `salida` con los MP4.
-- Solo algunos guiones: abre la Terminal en la carpeta `fabrica_shorts` y escribe
-  `crear_videos.bat 01 03` (crea solo los que tienen "01" o "03" en el nombre).
-- Si un vídeo sale con `__VOZ_DE_PRUEBA` en el nombre es que no había internet para la voz dominicana.
+
+---
+
+## 🔁 Uso diario (el día a día de la fábrica)
+
+1. **Escribe guiones nuevos** en `fabrica_shorts/guiones/` (copia la plantilla, ver más abajo).
+2. **Doble clic en `crear_videos.bat`**. Solo crea los guiones que **todavía no tienen vídeo**;
+   los ya hechos se saltan. Al final sale un **RESUMEN** con lo creado, avisos y errores.
+3. En `fabrica_shorts/salida/` tienes, por cada guion:
+   - `NN_nombre.mp4` → el vídeo para subir.
+   - `NN_nombre.txt` → **título, descripción, hashtags y fuentes** listos para copiar y pegar en
+     YouTube y TikTok, y recordatorios para publicar (etiqueta de IA, "no es para niños"…).
+
+**Opciones** (abre la Terminal en la carpeta `fabrica_shorts` y escribe):
+
+| Escribe | Qué hace |
+|---|---|
+| `crear_videos.bat` | Crea todos los vídeos que falten |
+| `crear_videos.bat 01 03` | Solo los guiones con "01" o "03" en el nombre |
+| `crear_videos.bat --forzar` | Vuelve a crear también los ya hechos (p. ej. tras cambiar `ajustes.toml`) |
+| `crear_videos.bat 07 --forzar` | Rehace solo el 07 |
+| `crear_videos.bat --sin-musica` | Sin dembow (para poner un sonido de TikTok al subir) |
+
+- Si un vídeo sale con **`__VOZ_DE_PRUEBA`** en el nombre es que no había internet para la voz dominicana:
+  **no lo publiques**. La próxima vez que ejecutes `crear_videos.bat` con internet se rehace solo y se
+  borra el de prueba.
+- Las voces se guardan en una caché: si solo cambias colores o música y usas `--forzar`, no se vuelven a pedir.
 
 ---
 
@@ -219,3 +252,10 @@ python3 -m venv .venv
   - `fabrica/musica.py`: compone el dembow original. `fabrica/audio.py`: voz a -15 LUFS, música a -20 LUFS
     con "ducking" (baja sola al hablar), fundidos de entrada/salida y limitador.
   - Opción `--sin-musica`. Fondos más oscuros con viñeta para que se lea mejor.
+- **Fase 5** – Fábrica por lotes:
+  - `crear_videos.py` solo crea lo que falta (`--forzar` para rehacer), rehace solo los vídeos de prueba
+    cuando vuelve la voz real, y termina con un resumen (creados, avisos, errores, tiempo).
+  - `fabrica/publicacion.py`: un `.txt` por vídeo con título, descripción, hashtags, fuentes, aviso de salud
+    y recordatorios de publicación. Avisa si el título pasa de 100 caracteres o el vídeo de 59 s.
+  - El vídeo se crea en `.trabajo/` y solo se mueve a `salida/` al terminar: si cortas la fábrica a mitad,
+    no queda un vídeo a medias que luego se dé por hecho. Sin `#shorts` en el texto de TikTok.

@@ -4,10 +4,10 @@ from __future__ import annotations
 import shutil
 import time
 import zlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import audio, config, graficos, render, subtitulos, voz
+from . import audio, config, graficos, publicacion, render, subtitulos, voz
 from .guion import leer_guion
 
 SUFIJO_PRUEBA = "__VOZ_DE_PRUEBA"
@@ -20,6 +20,13 @@ class Resultado:
     motor_voz: str
     codificador: str
     segundos: float
+    avisos: list[str] = field(default_factory=list)
+
+
+def salidas(nombre: str) -> tuple[Path, Path]:
+    """(vídeo con voz real, vídeo con voz de prueba) de un guion."""
+    return (config.CARPETA_SALIDA / f"{nombre}.mp4",
+            config.CARPETA_SALIDA / f"{nombre}{SUFIJO_PRUEBA}.mp4")
 
 
 def producir(archivo: Path, ajustes: dict, motor_voz: str = "auto", conservar: bool = False,
@@ -55,8 +62,19 @@ def producir(archivo: Path, ajustes: dict, motor_voz: str = "auto", conservar: b
     print("   🎬 Montando el vídeo…", flush=True)
     nombre = guion.nombre + ("" if motor == "edge" else SUFIJO_PRUEBA)
     salida = config.CARPETA_SALIDA / f"{nombre}.mp4"
-    codificador = render.renderizar(salida, duracion, pista_final, archivo_ass, capas, ajustes, trabajo, semilla)
+    # Se crea aparte y se mueve al final: así nunca queda un vídeo a medias en "salida"
+    temporal = trabajo / "video.mp4"
+    codificador = render.renderizar(temporal, duracion, pista_final, archivo_ass, capas, ajustes, trabajo, semilla)
+    temporal.replace(salida)
+
+    # 6) Texto para publicar
+    avisos = publicacion.crear_texto(guion, duracion, motor, salida.with_suffix(".txt"))
+    if duracion > float(ajustes["video"].get("duracion_aviso", 59)):
+        avisos.append(f"Dura {duracion:.0f} s: para Shorts/TikTok mejor menos de 60 s (acorta el guion).")
+    if motor == "edge":   # ya hay versión buena: se borra la de prueba
+        for viejo in (salidas(guion.nombre)[1], salidas(guion.nombre)[1].with_suffix(".txt")):
+            viejo.unlink(missing_ok=True)
 
     if not conservar:
         shutil.rmtree(trabajo, ignore_errors=True)
-    return Resultado(salida, duracion, motor, codificador.nombre, time.time() - reloj)
+    return Resultado(salida, duracion, motor, codificador.nombre, time.time() - reloj, avisos)

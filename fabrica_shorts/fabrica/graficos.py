@@ -127,7 +127,7 @@ def gancho(texto: str) -> Image.Image | None:
                 ancho_linea = 0.0
             ancho_linea += (espacio if lineas[-1] else 0) + w
             lineas[-1].append(p)
-        if len(lineas) <= 3:
+        if len(lineas) <= 2:      # máximo 2 líneas para no pisar los bocadillos
             break
 
     alto_linea = int(tamano * 1.18)
