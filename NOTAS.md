@@ -44,8 +44,9 @@ sobre los efectos del vaper, en clave de humor y con acento dominicano.
 - Opción fácil: instala **GitHub Desktop** (https://desktop.github.com), inicia sesión y haz
   *File → Clone repository → `Gonzaloruiizz/nightSpot2.0`*. Arriba, en *Current branch*, elige
   `claude/short-video-factory-oz41b0`. Para traer las novedades: botón **Fetch origin** → **Pull origin**.
-- Opción ZIP: en la web de GitHub elige la rama `claude/short-video-factory-oz41b0`, botón verde
-  **Code → Download ZIP**, y descomprímelo (por ejemplo en `Documentos`).
+- Opción ZIP (la más rápida): con tu cuenta de GitHub abierta en el navegador, entra en
+  https://github.com/Gonzaloruiizz/nightSpot2.0/archive/refs/heads/claude/short-video-factory-oz41b0.zip
+  y descomprímelo (por ejemplo en `Documentos`).
 
 **Paso 2 – Instalar Python** (abre la Terminal y pega):
 ```
@@ -68,8 +69,16 @@ Entra en la carpeta `fabrica_shorts` y haz **doble clic en `instalar.bat`**.
 Al final te sale una lista con ✅ / ❌. Si todo está en ✅, ¡listo!
 (Puedes volver a comprobarlo cuando quieras con doble clic en `comprobar.bat`).
 
-**Paso 6 – Crear los vídeos**
+**Paso 6 – Probar**
+- Doble clic en **`probar_voces.bat`** → escucha las muestras de voces en `salida\muestras_voces`.
+- Doble clic en **`probar_un_video.bat`** → crea solo el vídeo 01 (unos minutos) para ver cómo queda.
+
+**Paso 7 – Crear todos los vídeos**
 Doble clic en **`crear_videos.bat`**. Al terminar se abre sola la carpeta `salida` con los MP4.
+
+> 💡 Si Windows dice "Windows protegió su PC" al abrir un `.bat`: pulsa **Más información → Ejecutar de todas
+> formas**. Para que no salga más: antes de descomprimir el ZIP, clic derecho en el ZIP → **Propiedades** →
+> marca **Desbloquear** → Aceptar.
 
 ---
 
