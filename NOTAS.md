@@ -267,6 +267,7 @@ a dembow de verdad**. Para que suene a dembow auténtico hay dos caminos (los do
 | La voz pronuncia mal una palabra | En el guion usa `{palabra|cómo se dice}`, p. ej. `{vaper|véiper}` |
 | Vídeo con `__VOZ_DE_PRUEBA` | No había internet para la voz dominicana: lleva la voz de respaldo en español (sin acento). Conéctate y vuelve a crear ese vídeo |
 | `comprobar.bat` dice "le faltan filtros" con ffmpeg 8 o 9 | Era una falsa alarma del comprobador (ffmpeg cambió el formato de su lista). Arreglado: ahora pregunta filtro por filtro. Si de verdad falla un vídeo por "subtitles", instala la versión completa: `winget install --id Gyan.FFmpeg -e` |
+| Al abrir el vídeo: "No pudimos abrir… 0x8007060E" | Fallo de la app Fotos/Reproductor de Windows. Clic derecho → **Abrir con → Microsoft Edge**, o instala VLC: `winget install VideoLAN.VLC` |
 | "NVENC no disponible" en tu PC | Actualiza el driver de NVIDIA y vuelve a abrir `comprobar.bat`. Mientras tanto se usa el procesador (va más lento, pero funciona) |
 
 ---
@@ -323,3 +324,7 @@ a dembow de verdad**. Para que suene a dembow auténtico hay dos caminos (los do
 - **Prueba en el PC de Windows** (Python 3.14, ffmpeg 9.0 Essentials, RTX 2060): ✅ librerías, ✅ NVENC,
   ✅ voz dominicana. El comprobador daba una falsa alarma de "faltan filtros" con ffmpeg 9 → corregido
   (`herramientas.tiene_filtro` pregunta a ffmpeg filtro por filtro).
+- **Prueba completa en la nube** (estilo 2D, voz de respaldo, procesador): los **12 guiones generados sin errores**
+  (25 min, ~2 min por vídeo, 31-45 s cada uno).
+- **Si un vídeo no se abre en Windows** con el error `0x8007060E`: es un fallo de la app Fotos/Reproductor de Windows,
+  no del vídeo. Ábrelo con **Microsoft Edge** (clic derecho → Abrir con) o instala **VLC** (`winget install VideoLAN.VLC`).
