@@ -69,14 +69,26 @@ def main() -> int:
     except herramientas.ErrorFabrica as e:
         mal("ffmpeg no está listo", str(e))
 
-    print("\n4) Tipografías")
+    print("\n4) Tarjeta gráfica (NVENC)")
+    try:
+        from fabrica import render
+        codificador = render.elegir_codificador("auto")
+        if "NVENC" in codificador.nombre:
+            ok("NVENC funciona: los vídeos se renderizan con la NVIDIA 🚀")
+        else:
+            aviso("NVENC no disponible: se usará el procesador (funciona igual, pero más lento).")
+            print("      Si tienes una NVIDIA, actualiza su driver y vuelve a comprobar.")
+    except herramientas.ErrorFabrica as e:
+        mal("No se pudo probar el codificador", str(e))
+
+    print("\n5) Tipografías")
     for fuente in (config.FUENTE_SUBTITULOS, config.FUENTE_NOMBRES):
         if fuente.exists():
             ok(fuente.name)
         else:
             mal(f"Falta {fuente.name}", "Vuelve a descargar el proyecto desde GitHub")
 
-    print("\n5) Archivo .env (claves)")
+    print("\n6) Archivo .env (claves)")
     if config.ARCHIVO_ENV.exists():
         ok(".env encontrado (recuerda: nunca se sube a GitHub)")
     else:

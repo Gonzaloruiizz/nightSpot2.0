@@ -16,7 +16,7 @@ sobre los efectos del vaper, en clave de humor y con acento dominicano.
 | Fase | Qué es | Estado |
 |---|---|---|
 | 0 | Estructura base, `.env`, instalador de Windows, comprobador | ✅ Hecho |
-| 1 | Render vertical 1080×1920 con NVENC (NVIDIA) o procesador | ⏳ Falta |
+| 1 | Render vertical 1080×1920 con NVENC (NVIDIA) o procesador | ✅ Hecho |
 | 2 | Voces dominicanas + subtítulos palabra a palabra | ⏳ Falta |
 | 3 | Guiones graciosos con datos reales (OMS/CDC/FDA) | ⏳ Falta |
 | 4 | Estilo visual (avatares, emojis, gancho) + dembow con "ducking" | ⏳ Falta |
@@ -102,6 +102,7 @@ python3 -m venv .venv
 |---|---|
 | "No encuentro Python" | Reinstala Python marcando **Add python.exe to PATH** |
 | "No encuentro ffmpeg" | `winget install Gyan.FFmpeg` y **reabre** la Terminal. Si sigue, pon la ruta en `.env` → `FFMPEG_PATH=` |
+| "NVENC no disponible" en tu PC | Actualiza el driver de NVIDIA y vuelve a abrir `comprobar.bat`. Mientras tanto se usa el procesador (va más lento, pero funciona) |
 
 ---
 
@@ -109,3 +110,7 @@ python3 -m venv .venv
 
 - **Fase 0** – Carpetas, `.gitignore` (protege `.env`), `.env.example`, `ajustes.toml`, tipografías
   gratuitas, `instalar.bat` / `comprobar.bat` para Windows y `comprobar.py`.
+- **Fase 1** – Motor de render (`fabrica/render.py`): fondo animado (o tus clips), capas de imágenes
+  animadas, subtítulos y audio → MP4 1080×1920 a 30 fps. Detecta NVENC haciendo una **prueba real**
+  (no basta con que ffmpeg diga que lo tiene); si falla, usa el procesador (libx264).
+  `comprobar.py` ahora también dice si tu NVIDIA está lista. Se elige en `ajustes.toml` → `[render] codificador`.
