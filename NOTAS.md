@@ -82,6 +82,18 @@ Doble clic en **`crear_videos.bat`**. Al terminar se abre sola la carpeta `salid
 
 ---
 
+## 🔄 Cómo actualizar la fábrica en tu PC (cuando haya cambios nuevos)
+
+1. Descarga otra vez el ZIP del enlace del Paso 1 (clic derecho → Propiedades → **Desbloquear**).
+2. Clic derecho en el ZIP → **Extraer todo…** → elige **la misma carpeta** donde lo descomprimiste la primera vez
+   (por ejemplo `Documentos`) → **Extraer**.
+3. Cuando Windows pregunte, elige **"Reemplazar los archivos en el destino"**.
+
+Así se actualiza el código y los guiones **sin tocar** tu instalación (`.venv`), tus claves (`.env`), tus vídeos
+(`salida`) ni tu música. No hace falta volver a ejecutar `instalar.bat` (salvo que te lo diga).
+
+---
+
 ## 🔁 Uso diario (el día a día de la fábrica)
 
 1. **Escribe guiones nuevos** en `fabrica_shorts/guiones/` (copia la plantilla, ver más abajo).
@@ -328,3 +340,10 @@ a dembow de verdad**. Para que suene a dembow auténtico hay dos caminos (los do
   (25 min, ~2 min por vídeo, 31-45 s cada uno).
 - **Si un vídeo no se abre en Windows** con el error `0x8007060E`: es un fallo de la app Fotos/Reproductor de Windows,
   no del vídeo. Ábrelo con **Microsoft Edge** (clic derecho → Abrir con) o instala **VLC** (`winget install VideoLAN.VLC`).
+- **Mejora 4: fluidez y habla más dominicana** –
+  - Voz: se quita el silencio de relleno al principio y al final de cada frase; las **pausas entre frases son
+    variables** como en una conversación (tras una pregunta se contesta rápido, tras "…" pausa dramática, más pausa
+    si sigue hablando el mismo); velocidad algo más alta (Don Fello +3 %, Yefri +12 %). Ajuste `pausas` en
+    `ajustes.toml` para hacer la charla más rápida o más lenta.
+  - Guiones: los 12 reescritos con turnos más cortos, reacciones y habla dominicana ("Ombe", "Ajá", "'tá",
+    "na' má'", "un chin", "usté'", "verdá'", "dormí'", "inaugurao'"…), mismos datos y fuentes.

@@ -18,7 +18,7 @@ def _musica(duracion: float, ajustes: dict, trabajo: Path, semilla: int) -> list
         canciones = sorted(p for p in config.CARPETA_MUSICA.glob("*") if p.suffix.lower() in EXTENSIONES_AUDIO)
         if canciones:
             return ["-stream_loop", "-1", "-i", str(random.Random(semilla).choice(canciones))]
-        print("   ⚠️  No hay música en assets/musica: compongo un dembow.")
+        print("   ℹ️  No hay beat propio en assets/musica: uso el dembow de la fábrica.")
     beat = trabajo / "dembow.wav"
     musica.componer_dembow(duracion, beat, semilla, float(m.get("bpm", 120)))
     return ["-i", str(beat)]

@@ -182,11 +182,13 @@ def _duracion_wav(ruta: Path) -> float:
         return w.getnframes() / w.getframerate()
 
 
-def _recortar_final(ruta: Path, hasta: float) -> None:
-    """Quita el silencio largo que algunas voces dejan al final."""
+def _recortar(ruta: Path, desde: float, hasta: float) -> None:
+    """Quita el silencio que algunas voces dejan al principio y al final."""
     with wave.open(str(ruta), "rb") as w:
         params = w.getparams()
-        datos = w.readframes(min(w.getnframes(), int(hasta * w.getframerate())))
+        frecuencia = w.getframerate()
+        w.setpos(min(w.getnframes(), int(desde * frecuencia)))
+        datos = w.readframes(max(0, int((hasta - desde) * frecuencia)))
     with wave.open(str(ruta), "wb") as w:
         w.setparams(params)
         w.writeframes(datos)
@@ -198,7 +200,7 @@ def sintetizar(texto: str, personaje: dict, motor: str) -> AudioFrase:
     """Audio de una frase, usando la caché si ya se hizo antes con el mismo texto y voz."""
     CARPETA_CACHE_VOZ.mkdir(parents=True, exist_ok=True)
     ajustes_voz = {k: personaje.get(k) for k in ("voz", "velocidad", "tono", "voz_respaldo", "velocidad_respaldo")}
-    clave = "|".join([motor, json.dumps(ajustes_voz, sort_keys=True), texto])
+    clave = "|".join(["v2", motor, json.dumps(ajustes_voz, sort_keys=True), texto])
     nombre = hashlib.sha1(clave.encode("utf-8")).hexdigest()[:16]
     wav = CARPETA_CACHE_VOZ / f"{motor}_{nombre}.wav"
     datos = wav.with_suffix(".json")
@@ -210,9 +212,11 @@ def sintetizar(texto: str, personaje: dict, motor: str) -> AudioFrase:
     try:
         marcas = MOTORES[motor](texto, personaje, temporal)
         if marcas:
-            fin_voz = max(m[2] for m in marcas) + 0.25
-            if _duracion_wav(temporal) > fin_voz:
-                _recortar_final(temporal, fin_voz)
+            # Sin silencios de relleno: la frase empieza justo antes de la primera palabra
+            desde = max(0.0, min(m[1] for m in marcas) - 0.06)
+            hasta = min(_duracion_wav(temporal), max(m[2] for m in marcas) + 0.18)
+            _recortar(temporal, desde, hasta)
+            marcas = [(t, a - desde, b - desde) for t, a, b in marcas]
         temporal.replace(wav)
     finally:
         temporal.unlink(missing_ok=True)
@@ -259,6 +263,26 @@ def alinear(frase: Frase, audio: AudioFrase) -> None:
         anterior = palabra.inicio
 
 
+def pausa_entre(anterior: Frase, siguiente: Frase | None, ritmo: float) -> float:
+    """Silencio entre dos frases según cómo acaba una y empieza la otra."""
+    if siguiente is None:
+        return 0.3
+    final = anterior.texto_voz.rstrip()[-1:] if anterior.texto_voz.strip() else "."
+    if final == "?":
+        pausa = 0.12          # a una pregunta se contesta rápido
+    elif final == "…":
+        pausa = 0.45          # puntos suspensivos: pausa dramática
+    elif final == "!":
+        pausa = 0.16
+    else:
+        pausa = 0.22
+    if siguiente.personaje == anterior.personaje:
+        pausa += 0.15         # el mismo sigue hablando: respira
+    if siguiente.texto_voz.lstrip().startswith("…"):
+        pausa += 0.35         # el otro duda antes de contestar
+    return pausa * ritmo
+
+
 def crear_pista(frases: list[Frase], ajustes: dict, motor_pedido: str, destino: Path) -> tuple[float, str]:
     """Crea la pista de voz completa (todas las frases seguidas).
 
@@ -266,7 +290,7 @@ def crear_pista(frases: list[Frase], ajustes: dict, motor_pedido: str, destino: 
     Devuelve (duración de la pista, motor usado).
     """
     personajes = ajustes["personajes"]
-    pausa = float(ajustes.get("voz", {}).get("pausa_entre_frases", 0.22))
+    ritmo = float(ajustes.get("voz", {}).get("pausas", 1.0))
     motores = ORDEN_MOTORES.get(motor_pedido, ORDEN_MOTORES["auto"])
     audios: list[AudioFrase] = []
     for motor in motores:
@@ -289,7 +313,8 @@ def crear_pista(frases: list[Frase], ajustes: dict, motor_pedido: str, destino: 
         salida.setsampwidth(2)
         salida.setframerate(FRECUENCIA)
         cursor = 0.0
-        for frase, audio in zip(frases, audios):
+        for n, (frase, audio) in enumerate(zip(frases, audios)):
+            pausa = pausa_entre(frase, frases[n + 1] if n + 1 < len(frases) else None, ritmo)
             alinear(frase, audio)
             frase.inicio = cursor
             frase.fin = cursor + audio.duracion
