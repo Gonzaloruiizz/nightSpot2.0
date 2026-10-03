@@ -43,7 +43,7 @@ def main() -> int:
     config.cargar_env()
 
     print("\n2) Librerías de Python")
-    for modulo, paquete in [("edge_tts", "edge-tts"), ("PIL", "Pillow"),
+    for modulo, paquete in [("edge_tts", "edge-tts"), ("kokoro_onnx", "kokoro-onnx"), ("PIL", "Pillow"),
                             ("numpy", "numpy"), ("dotenv", "python-dotenv")]:
         try:
             importlib.import_module(modulo)
