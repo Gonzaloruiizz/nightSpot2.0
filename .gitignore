@@ -1,0 +1,26 @@
+# ─── Claves y contraseñas: NUNCA se suben a GitHub ───
+.env
+.env.*
+!.env.example
+
+# ─── Python ───
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ─── Fábrica de shorts: cosas que se generan solas ───
+fabrica_shorts/salida/
+fabrica_shorts/.trabajo/
+fabrica_shorts/.cache/
+
+# Tu música y tus clips de fondo se quedan en tu PC (pueden tener copyright)
+fabrica_shorts/assets/musica/*
+!fabrica_shorts/assets/musica/LEEME.txt
+fabrica_shorts/assets/fondos/*
+!fabrica_shorts/assets/fondos/LEEME.txt
+
+# ─── Archivos del sistema ───
+.DS_Store
+Thumbs.db
+desktop.ini

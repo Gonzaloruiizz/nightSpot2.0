@@ -1,0 +1,8 @@
+* text=auto
+# Los .bat de Windows necesitan saltos de línea de Windows (CRLF)
+*.bat text eol=crlf
+*.ttf binary
+*.png binary
+*.mp3 binary
+*.mp4 binary
+*.wav binary

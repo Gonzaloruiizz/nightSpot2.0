@@ -1,0 +1,4 @@
+Pon aquí tu propia música si quieres (mp3, wav, m4a).
+OJO: solo música SIN copyright o con licencia (por ejemplo, la biblioteca de audio de YouTube).
+Si esta carpeta está vacía, la fábrica compone sola un beat de dembow original.
+Lo que pongas aquí NO se sube a GitHub.

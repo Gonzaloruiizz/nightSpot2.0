@@ -1,0 +1,4 @@
+Pon aquí clips de vídeo propios para usarlos de fondo (mp4, mov).
+La fábrica los recorta solos a formato vertical.
+Si esta carpeta está vacía, se usa un fondo animado de colores.
+Lo que pongas aquí NO se sube a GitHub.

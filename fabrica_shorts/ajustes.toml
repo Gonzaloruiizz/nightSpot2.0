@@ -1,0 +1,47 @@
+# ═══════════════════════════════════════════════════════════════
+#  AJUSTES DE LA FÁBRICA DE SHORTS
+#  Puedes cambiarlos con el Bloc de notas. Guarda y vuelve a crear
+#  los vídeos para ver el cambio.
+#  Las líneas que empiezan por # son comentarios (no hacen nada).
+# ═══════════════════════════════════════════════════════════════
+
+[video]
+ancho = 1080          # 1080 x 1920 = formato vertical 9:16
+alto = 1920
+fps = 30
+cola_final = 0.8      # segundos extra al final para que no corte de golpe
+duracion_aviso = 59   # avisa si un vídeo dura más que esto
+
+[render]
+# "auto"  = usa la tarjeta NVIDIA (NVENC) si está disponible; si no, el procesador
+# "nvenc" = obliga a usar la NVIDIA
+# "cpu"   = obliga a usar el procesador
+codificador = "auto"
+calidad = 20          # 18 = mejor calidad (archivo grande) · 24 = más ligero
+
+# ─── PERSONAJES ────────────────────────────────────────────────
+# En los guiones cada frase empieza por el nombre en MAYÚSCULAS
+# (FELLO: ... / YEFRI: ...). Aquí se decide cómo suena y se ve cada uno.
+#   voz       = voz de Microsoft (es-DO = República Dominicana)
+#   velocidad = más rápido "+10%" / más lento "-10%"
+#   tono      = más agudo "+20Hz" / más grave "-10Hz"
+#   color     = color de su nombre y de sus palabras en los subtítulos
+
+[personajes.FELLO]
+nombre = "Don Fello"
+voz = "es-DO-EmilioNeural"
+velocidad = "-4%"
+tono = "-10Hz"
+color = "#FFC93C"
+avatar = "🧔🏽‍♂️"
+lado = "izquierda"
+
+[personajes.YEFRI]
+nombre = "Yefri"
+voz = "es-DO-EmilioNeural"
+velocidad = "+12%"
+tono = "+22Hz"
+color = "#3DF5C8"
+avatar = "🧑🏽"
+accesorio = "🧢"
+lado = "derecha"
