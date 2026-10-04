@@ -43,7 +43,7 @@ def test_detectar_activacion(texto, esperado):
 
 
 def test_saludos_sin_orden():
-    for texto in ("Rochi, ¿estás ahí?", "¿Rochi?", "Rochi, ven acá", "Rochi"):
+    for texto in ("Rochi, ¿estás ahí?", "¿Rochi?", "Rochi, ven acá", "Rochi", "Rochi esta hay", "Rochi, ¿tas ahí?"):
         llamado, orden = rochi.detectar_activacion(texto, PALABRAS)
         assert llamado and h.normalizar(orden) in rochi.SOLO_LLAMADA
 

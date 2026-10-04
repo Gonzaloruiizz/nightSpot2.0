@@ -31,7 +31,11 @@ log = logging.getLogger("rochi")
 SALUDO = "Aquí estoy compay, ¿qué es lo que tú quieres que le haga loco?"
 DESPEDIDA = "A la orden, compay. Cuando me necesites, me llamas."
 # Lo que puede venir después del nombre sin que sea una orden ("Rochi, ¿estás ahí?", "Rochi, ven acá").
-SOLO_LLAMADA = {"", "estas ahi", "tas ahi", "estas", "ahi", "ven aca", "ven aqui", "ven", "oye", "dime", "mira"}
+SOLO_LLAMADA = {
+    "", "estas", "ahi", "ven", "oye", "dime", "mira", "ven aca", "ven aqui",
+    "estas ahi", "esta ahi", "tas ahi", "ta ahi", "estas hay", "esta hay", "tas hay", "ta hay",
+    "estas aqui", "esta aqui", "estas ai", "esta ai",
+}
 DESPEDIDAS = {"eso es todo", "eso es to", "descansa", "vete a dormir", "ve a dormir", "nada mas", "ya esta", "ya ta"}
 
 MAX_VUELTAS = 10  # llamadas al modelo por orden (cada ronda de herramientas cuenta una)

@@ -61,11 +61,11 @@ class Voz:
         return self._hablando or self.ultimo_fin > momento
 
     def hablar(self, texto: str) -> None:
+        if self.eco and texto.strip():
+            print(f"Rochi: {texto.strip()}", flush=True)  # en pantalla tal cual (nombres como ANTHROPIC_API_KEY)
         texto = limpiar_para_voz(texto)
         if not texto:
             return
-        if self.eco:
-            print(f"Rochi: {texto}", flush=True)
         if self.mudo or sys.platform != "win32":
             return
         with self._candado:
