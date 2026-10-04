@@ -1,0 +1,21 @@
+# Cerebro y servidor MCP
+anthropic>=1.11
+mcp>=2.3
+
+# Herramientas de Windows
+psutil>=6.0
+pycaw
+comtypes>=1.4
+pillow>=10.0
+
+# Voz
+SpeechRecognition>=3.11
+PyAudio>=0.2.14
+edge-tts>=7.0
+
+# Opcional: reconocimiento de voz local en la GPU (pon "motor": "whisper" en config.json)
+# faster-whisper>=1.1
+# numpy
+
+# Opcional: test de velocidad si no tienes el CLI oficial de Ookla
+# speedtest-cli

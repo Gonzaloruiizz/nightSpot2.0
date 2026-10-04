@@ -1,0 +1,19 @@
+{
+  "modelo": "claude-opus-5-5",
+  "esfuerzo": "low",
+  "voz": {
+    "voz_edge": "es-DO-EmilioNeural",
+    "velocidad": "+8%"
+  },
+  "oido": {
+    "motor": "google",
+    "microfono": null
+  },
+  "apps": {
+    "afterburner": ["%ProgramFiles(x86)%\\MSI Afterburner\\MSIAfterburner.exe"]
+  },
+  "rutas": {
+    "cinebench": "C:\\Benchmarks\\CinebenchR23\\Cinebench.exe",
+    "occt": "C:\\Benchmarks\\OCCT.exe"
+  }
+}
