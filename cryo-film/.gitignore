@@ -8,3 +8,9 @@ photoreal/tmp/
 photoreal/export/
 proyecto_lazaro_movil.mp4
 photoreal/soundtrack_v2.wav
+photoreal3/renders/
+photoreal3/out/
+photoreal3/out_preview/
+photoreal3/tmp_*/
+photoreal3/x264v3*
+__pycache__/
