@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proyecto Lázaro</title>
+<style>
+@font-face { font-family: Rajdhani; src: url(assets/fonts/Rajdhani-Light.ttf); font-weight: 300; }
+@font-face { font-family: Rajdhani; src: url(assets/fonts/Rajdhani-Medium.ttf); font-weight: 500; }
+@font-face { font-family: ShareTech; src: url(assets/fonts/ShareTechMono-Regular.ttf); }
+@font-face { font-family: Exo2; src: url(assets/fonts/Exo2-VF.ttf); font-weight: 100 900; }
+html, body { margin: 0; background: #000; overflow: hidden; }
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: #000; transform-origin: 0 0; }
+#gl { position: absolute; left: 0; top: 138px; width: 1920px; height: 804px; display: block; }
+#overlay { position: absolute; inset: 0; pointer-events: none; color: #d6ecff; }
+.cue { position: absolute; opacity: 0; -webkit-mask-image: linear-gradient(90deg, #000 var(--clip, 100%), transparent calc(var(--clip, 100%) + 2%)); }
+.cue.loc { left: 110px; top: 770px; font: 300 46px/1.15 Rajdhani; letter-spacing: 0.32em; text-shadow: 0 0 18px rgba(80,200,255,0.35); }
+.cue.loc span { font: 500 22px ShareTech; letter-spacing: 0.3em; color: #8fd3ff; }
+.cue.hud { left: 110px; top: 830px; font: 22px/1.45 ShareTech; letter-spacing: 0.16em; color: #a9e4ff; text-shadow: 0 0 10px rgba(60,190,255,0.5); padding-left: 18px; border-left: 2px solid rgba(110,220,255,0.7); }
+.cue.hud b { font-weight: normal; color: #6dffd2; }
+.cue.warn { color: #ffb4a8; border-left-color: rgba(255,90,70,0.9); text-shadow: 0 0 12px rgba(255,70,50,0.6); }
+.cue.warn b { color: #ffd9a0; }
+.title { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; }
+.title .t1 { font: 200 96px Exo2; color: #e8fbff; text-shadow: 0 0 30px rgba(90,255,220,0.45), 0 0 80px rgba(60,200,255,0.25); padding-left: 0.55em; }
+.title .t2 { margin-top: 26px; font: 300 26px Rajdhani; letter-spacing: 0.6em; color: #7fd8e8; padding-left: 0.6em; }
+.rec { position: absolute; right: 110px; top: 160px; font: 18px ShareTech; letter-spacing: 0.2em; color: rgba(200,235,255,0.75); display: none; }
+.rec i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: #ff3b2f; margin-right: 10px; box-shadow: 0 0 8px #ff3b2f; }
+</style>
+<script type="importmap">{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }</script>
+</head>
+<body>
+<div id="stage"><canvas id="gl" width="1920" height="804"></canvas><div id="overlay"></div></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

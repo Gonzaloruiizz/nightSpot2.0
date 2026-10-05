@@ -1,0 +1,8 @@
+node_modules/
+frames/
+*.wav
+*.log
+photoreal/frames/
+photoreal/preview/
+photoreal/tmp/
+photoreal/export/
