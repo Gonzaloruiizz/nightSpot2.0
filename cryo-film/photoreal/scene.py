@@ -754,7 +754,7 @@ def shot_lab(shot):
         # rack focus: glass first, then the face
         cam.data.dof.focus_object = None
         dg = (p0 - face).length
-        for f, dd in ((1, dg * 0.62), (F(1.4), dg * 0.62), (F(3.0), (p1 - face).length), (n, (p1 - face).length)):
+        for f, dd in ((1, dg * 0.47), (F(0.6), dg * 0.47), (F(1.9), (p1 - face).length), (n, (p1 - face).length)):
             cam.data.dof.focus_distance = dd
             cam.data.dof.keyframe_insert('focus_distance', frame=f)
         handheld(cam, n, 0.0015, 2)
