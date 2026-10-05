@@ -21,7 +21,7 @@ segs = []
 for shot, dur in ORDER:
     src = sorted(glob.glob(os.path.join(FR, shot, '*.jpg')))
     seq = os.path.join(TMP, shot); shutil.rmtree(seq, ignore_errors=True); os.makedirs(seq)
-    for i, f in enumerate(src):
+    for i, f in enumerate(src + [src[-1]] * 3):  # pad: minterpolate drops the tail
         os.symlink(f, os.path.join(seq, f'{i:04d}.jpg'))
     vf = ['minterpolate=fps=24:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1', 'scale=1920:804:flags=lanczos', 'unsharp=5:5:0.6']
     fi, fid, fo, fod = FADES[shot]
