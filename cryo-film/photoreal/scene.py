@@ -264,7 +264,7 @@ def lab_materials(info):
     M['Beam'] = principled('Beam', (0.04, 0.045, 0.05), 0.5, 0.7)
     M['RobotWhite'] = add_noise_roughness(principled('RobotWhite', (0.72, 0.74, 0.76), 0.28, 0.0, coat=0.6), 0.22, 0.35, 120)
     M['RobotDark'] = principled('RobotDark', (0.02, 0.022, 0.025), 0.35, 0.6)
-    M['Serum'] = principled('Serum', (0.02, 0.2, 0.15), 0.1, 0.0, emit=SERUM, emit_s=18.0)
+    M['Serum'] = principled('Serum', (0.02, 0.2, 0.15), 0.1, 0.0, emit=SERUM, emit_s=5.0)
     M['Suit'] = principled('Suit', (0.78, 0.8, 0.82), 0.78, 0.0, sheen=0.6)
     M['SuitJoints'] = principled('SuitJoints', (0.55, 0.58, 0.6), 0.6, 0.0, sheen=0.4)
     M['Gown'] = principled('Gown', (0.72, 0.76, 0.8), 0.82, 0.0, sheen=0.7)
@@ -408,7 +408,7 @@ def skin_material(info, front_keys, frost_keys, vein_keys, scale_keys, eye_keys)
         e = node(nt, 'ShaderNodeVectorMath', (-1900, -800)); e.operation = 'DISTANCE'
         link(nt, geo.outputs['Position'], e.inputs[0]); e.inputs[1].default_value = conv(info[k])
         e2 = node(nt, 'ShaderNodeMapRange', (-1700, -800))
-        e2.inputs['From Min'].default_value = 0.0; e2.inputs['From Max'].default_value = 0.022
+        e2.inputs['From Min'].default_value = 0.0; e2.inputs['From Max'].default_value = 0.015
         e2.inputs['To Min'].default_value = 1.0; e2.inputs['To Max'].default_value = 0.0
         e2.interpolation_type = 'SMOOTHSTEP'
         link(nt, e.outputs['Value'], e2.inputs['Value'])
@@ -729,7 +729,7 @@ def shot_lab(shot):
     elif shot == 'needle':
         mut = ([(1, -0.02), (F(1.6), -0.01), (F(4.5), 0.018)], [(1, 1.0)], [(1, 0.0), (F(1.6), 0.0), (F(3.0), 2.5), (F(4.5), 3.5)], [(1, 0.0)], [(1, 0.0)])
     else:  # mutation
-        mut = ([(1, 0.03), (F(5.2), 0.2), (F(7), 0.26)], [(1, 1.0), (F(4), 0.6)], [(1, 2.5), (F(3), 3.5), (F(7), 4.0)], [(1, 0.0), (F(2.0), 0.0), (F(5.0), 1.0)], [(1, 0.0), (F(4.6), 0.0), (F(6.4), 12.0), (F(7), 30.0)])
+        mut = ([(1, 0.03), (F(5.2), 0.2), (F(7), 0.26)], [(1, 1.0), (F(4), 0.6)], [(1, 2.5), (F(3), 3.5), (F(7), 4.0)], [(1, 0.0), (F(2.0), 0.0), (F(5.0), 1.0)], [(1, 0.0), (F(4.6), 0.0), (F(6.4), 3.5), (F(7), 8.0)])
     info, bust, M = build_lab(state, mut)
     lab_lights(info, alarm=(shot == 'mutation'), haze=0.018 if shot == 'establish' else 0.0)
     if shot == 'establish':
@@ -759,9 +759,9 @@ def shot_lab(shot):
             cam.data.dof.keyframe_insert('focus_distance', frame=f)
         handheld(cam, n, 0.0015, 2)
     elif shot == 'needle':
-        cam, tgt = camera(lens=85, fstop=3.5)
+        cam, tgt = camera(lens=50, fstop=2.8)
         up = Vector((0, 0, 1)); ax = Vector((1, 0, 0))
-        cam_path(cam, tgt, [(1, inj + up * 0.24 + injN * 0.16 - ax * 0.12, inj + injN * 0.09), (n, inj + up * 0.19 + injN * 0.12 - ax * 0.07, inj + injN * 0.04)])
+        cam_path(cam, tgt, [(1, inj + up * 0.27 + injN * 0.2 - ax * 0.15, inj + injN * 0.13), (n, inj + up * 0.22 + injN * 0.15 - ax * 0.1, inj + injN * 0.08)])
         handheld(cam, n, 0.0012, 3)
         # injector approaches (rigid move of the arm), serum drains
         rob = find('Robot')
