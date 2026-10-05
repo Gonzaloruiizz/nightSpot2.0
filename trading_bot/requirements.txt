@@ -1,0 +1,18 @@
+# Bot de trading por sentimiento — dependencias de ejecución
+# Probado con Python 3.10, 3.11, 3.12 y 3.13 (pandas 2.2, 2.3 y 3.0)
+
+# Brokers
+alpaca-py>=0.40,<1.0          # Acciones USA (Alpaca): trading, datos de mercado
+ccxt>=4.4,<5.0                # Cripto: Binance, Kraken (API unificada)
+
+# Datos y cálculo
+pandas>=2.1,<4.0
+numpy>=1.26,<3.0
+
+# Noticias y sentimiento
+vaderSentiment>=3.3.2,<4.0    # NLP ligero para titulares (sin GPU ni descargas)
+feedparser>=6.0.11,<7.0       # Lectura de feeds RSS
+requests>=2.31,<3.0           # HTTP (NewsAPI, Alpha Vantage, Alpaca News)
+
+# Configuración
+python-dotenv>=1.0,<2.0       # Carga del archivo .env

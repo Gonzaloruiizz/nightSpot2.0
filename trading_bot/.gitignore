@@ -1,0 +1,14 @@
+# ¡Nunca subir claves API!
+.env
+
+# Datos generados en ejecución
+logs/
+state/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.ruff_cache/

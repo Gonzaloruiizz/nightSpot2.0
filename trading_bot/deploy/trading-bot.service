@@ -1,0 +1,35 @@
+# Servicio systemd para ejecutar el bot 24/7 en un VPS Linux.
+# Instalación (ver README.md, sección "Ejecutar en un VPS"):
+#   sudo cp deploy/trading-bot.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now trading-bot
+#   journalctl -u trading-bot -f
+#
+# Ajusta User y las rutas si no usas el usuario "trader" ni /home/trader/trading_bot.
+
+[Unit]
+Description=Bot de trading por sentimiento (paper/live)
+After=network-online.target
+Wants=network-online.target
+# Sin reinicios en bucle infinito si hay un error de configuración
+StartLimitIntervalSec=600
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=trader
+WorkingDirectory=/home/trader/trading_bot
+ExecStart=/home/trader/trading_bot/.venv/bin/python bot.py
+# Reinicio automático si el proceso muere (el estado se restaura de state/)
+Restart=always
+RestartSec=15
+# SIGTERM -> el bot termina el ciclo en curso y guarda el estado
+KillSignal=SIGTERM
+TimeoutStopSec=60
+Environment=PYTHONUNBUFFERED=1
+# Endurecimiento básico
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
